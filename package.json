@@ -31,6 +31,8 @@
     "@nestjs/serve-static": "^5.0.4",
     "@nestjs/swagger": "^11.2.3",
     "@prisma/client": "^7.1.0",
-    "prisma": "^7.1.0"
+    "@types/react-router-dom": "^5.3.3",
+    "prisma": "^7.1.0",
+    "react-router-dom": "^7.11.0"
   }
 }

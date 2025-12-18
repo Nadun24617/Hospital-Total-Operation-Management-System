@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Signup from './Signup';
 import { useAuth } from '../auth';
@@ -12,6 +13,7 @@ export default function Login() {
   const [showSignup, setShowSignup] = useState(false);
   const [banner, setBanner] = useState('');
   const { login } = useAuth();
+  const navigate = useNavigate();
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -24,6 +26,9 @@ export default function Login() {
         password,
       });
       login(response.data.accessToken, response.data.user);
+      if (response.data.user.role?.toLowerCase() === 'patient') {
+        navigate('/patient-dashboard');
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Login failed.');
     }
