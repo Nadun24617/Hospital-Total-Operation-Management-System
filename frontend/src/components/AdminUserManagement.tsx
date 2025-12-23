@@ -60,7 +60,7 @@ export default function AdminUserManagement() {
     setError('');
     setBanner('');
     try {
-      const response = await axios.get<ManagedUser[]>('http://localhost:3000/admin/users', {
+      const response = await axios.get<ManagedUser[]>(`${import.meta.env.VITE_API_URL}/admin/users`, {
         headers: authHeaders
       });
       setUsers(response.data);
@@ -88,7 +88,7 @@ export default function AdminUserManagement() {
 
     setBanner('');
     try {
-      const response = await axios.patch<ManagedUser>(`http://localhost:3000/admin/users/${userId}/confirm`, {}, {
+      const response = await axios.patch<ManagedUser>(`${import.meta.env.VITE_API_URL}/admin/users/${userId}/confirm`, {}, {
         headers: authHeaders
       });
       setUsers(prev => prev.map(user => (user.id === userId ? response.data : user)));
@@ -118,7 +118,7 @@ export default function AdminUserManagement() {
     const selectedRole = roleSelection[userId];
     try {
       const response = await axios.patch<ManagedUser>(
-        `http://localhost:3000/admin/users/${userId}/role`,
+        `${import.meta.env.VITE_API_URL}/admin/users/${userId}/role`,
         { role: selectedRole },
         { headers: authHeaders }
       );
@@ -153,7 +153,7 @@ export default function AdminUserManagement() {
 
     try {
       const response = await axios.post<{ message: string; user: ManagedUser }>(
-        'http://localhost:3000/admin/users/staff',
+        `${import.meta.env.VITE_API_URL}/admin/users/staff`,
         staffForm,
         { headers: authHeaders }
       );

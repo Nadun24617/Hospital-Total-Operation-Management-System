@@ -34,7 +34,7 @@ export default function Signup({ onSuccess, onCancel }: SignupProps) {
       return;
     }
     try {
-      await axios.post('http://localhost:3000/user/signup', {
+      await axios.post(`${import.meta.env.VITE_API_URL}/user/signup`, {
         firstName: form.firstName,
         lastName: form.lastName,
         email: form.email,

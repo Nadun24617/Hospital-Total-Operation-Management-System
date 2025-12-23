@@ -21,12 +21,12 @@ export default function Login() {
     setError('');
     setBanner('');
     try {
-      const response = await axios.post('http://localhost:3000/user/login', {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/user/login`, {
         email,
         password,
       });
       login(response.data.accessToken, response.data.user);
-      if (response.data.user.role?.toLowerCase() === 'patient') {
+      if (response.data.user.role?.toLowerCase() === 'user') {
         navigate('/patient-dashboard');
       }
     } catch (err: any) {

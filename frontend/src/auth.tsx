@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 
 interface AuthUser {
@@ -23,9 +23,26 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [token, setToken] = useState<string | null>(null);
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [token, setToken] = useState<string | null>(() => {
+    return localStorage.getItem('token');
+  });
+  const [user, setUser] = useState<AuthUser | null>(() => {
+    const userStr = localStorage.getItem('user');
+    return userStr ? JSON.parse(userStr) : null;
+  });
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return !!localStorage.getItem('token');
+  });
+
+  useEffect(() => {
+    if (token && user) {
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
+  }, [token, user]);
 
   const login = (accessToken: string, userData: AuthUser) => {
     setToken(accessToken);
@@ -37,7 +54,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(null);
     setUser(null);
     setIsLoggedIn(false);
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
   };
+
 
   return (
     <AuthContext.Provider value={{ isLoggedIn, token, user, login, logout }}>

@@ -1,194 +1,141 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
+import PatientDashboardNavBar from '../components/PatientDashboardNavBar';
 
 
 const navLinks = [
-  { label: 'Profile', id: 'profile' },
-  { label: 'Hospital Info', id: 'hospital' },
+  { label: 'About Us', id: 'hospital' },
   { label: 'Appointments', id: 'appointments' },
   { label: 'Doctors', id: 'doctors' },
 ];
 
 const PatientDashboard: React.FC = () => {
-  const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [activeSection, setActiveSection] = useState('profile');
+  const [activeSection, setActiveSection] = useState(navLinks[0].id);
 
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        setProfilePhoto(ev.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
       {/* Navigation bar */}
-      <nav className="bg-white shadow-md px-6 py-4 flex items-center justify-between">
-        <div className="text-2xl font-bold text-blue-600">Hospital Portal</div>
-        <div className="flex items-center gap-6">
-          {navLinks.map((link) => (
-            <button
-              key={link.id}
-              className={`text-lg font-medium px-3 py-1 rounded hover:bg-blue-50 transition-colors ${activeSection === link.id ? 'text-blue-600' : 'text-gray-700'}`}
-              onClick={() => setActiveSection(link.id)}
-            >
-              {link.label}
-            </button>
-          ))}
-          <div className="relative ml-4">
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              ref={fileInputRef}
-              onChange={handlePhotoChange}
-            />
-            <button
-              className="focus:outline-none"
-              onClick={() => fileInputRef.current?.click()}
-              title="Upload profile photo"
-            >
-              {profilePhoto ? (
-                <img
-                  src={profilePhoto}
-                  alt="Profile"
-                  className="w-10 h-10 rounded-full object-cover border-2 border-blue-500 shadow"
-                />
-              ) : (
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold border-2 border-blue-300">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                  </svg>
-                </div>
-              )}
-            </button>
+      <div className="relative">
+        <PatientDashboardNavBar
+          navLinks={navLinks}
+          activeSection={activeSection}
+          setActiveSection={setActiveSection}
+        />
+      </div>
+
+      {/* Landing Page Content */}
+      <main className="max-w-6xl mx-auto mt-8 p-4 space-y-12">
+        {/* ...existing code... */}
+        <section className="bg-white rounded-3xl shadow p-8 md:p-10 flex flex-col md:flex-row items-center gap-8">
+          <div className="flex-1">
+            <p className="text-sm uppercase tracking-[0.2em] text-blue-500 mb-2">Welcome to ABC Hospital</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-blue-800 mb-3">
+              Efficient Care, <span className="text-blue-500">Seamless Management</span>
+            </h1>
+            <p className="text-gray-600 mb-6 max-w-xl">
+              Access appointments, medical records, billing, and hospital services from a single, secure dashboard built for patients, doctors, and administrators.
+            </p>
           </div>
-        </div>
-      </nav>
-      <main className="max-w-6xl mx-auto mt-8 p-4">
-        {activeSection === 'profile' && (
-          <section className="bg-white rounded-lg shadow p-6 max-w-xl mx-auto">
-            <h2 className="text-xl font-semibold mb-4 text-blue-700">My Profile</h2>
-            <div className="flex flex-col items-center gap-4">
-              <div>
-                <img
-                  src={profilePhoto || 'https://ui-avatars.com/api/?name=Patient&background=E0E7FF&color=1E40AF'}
-                  alt="Profile"
-                  className="w-24 h-24 rounded-full object-cover border-2 border-blue-500 shadow"
-                />
-              </div>
-              <button
-                className="text-blue-600 hover:underline text-sm"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                {profilePhoto ? 'Change Profile Photo' : 'Upload Profile Photo'}
-              </button>
-              {/* Add more profile fields here */}
-              <div className="w-full mt-4">
-                <label className="block text-gray-700 mb-1">Full Name</label>
-                <input className="w-full border rounded px-3 py-2" type="text" placeholder="John Doe" />
-              </div>
-              <div className="w-full mt-2">
-                <label className="block text-gray-700 mb-1">Email</label>
-                <input className="w-full border rounded px-3 py-2" type="email" placeholder="john@example.com" />
-              </div>
-              <div className="w-full mt-2">
-                <label className="block text-gray-700 mb-1">Phone</label>
-                <input className="w-full border rounded px-3 py-2" type="tel" placeholder="+1 234 567 890" />
-              </div>
-              <button className="mt-4 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">Save Changes</button>
+          <div className="flex-1 flex justify-center">
+            <div className="w-full max-w-sm h-48 md:h-60 rounded-3xl bg-gradient-to-br from-blue-50 to-green-50 border border-blue-100 flex items-center justify-center text-blue-400 text-sm md:text-base">
+              Modern hospital illustration / hero image
             </div>
-          </section>
-        )}
-        {activeSection === 'hospital' && (
-          <section className="bg-white rounded-lg shadow p-6 max-w-2xl mx-auto">
-            <h2 className="text-xl font-semibold mb-4 text-blue-700">Hospital Information</h2>
-            <p className="text-gray-700 mb-2">Welcome to our hospital! We provide world-class healthcare services with a team of experienced professionals and state-of-the-art facilities.</p>
-            <ul className="list-disc pl-6 text-gray-700">
-              <li>24/7 Emergency Services</li>
-              <li>Modern Operation Theaters</li>
-              <li>Specialized Departments</li>
-              <li>Pharmacy & Diagnostics</li>
-              <li>Patient-Centric Care</li>
+          </div>
+        </section>
+        {/* ...existing code... */}
+        <section>
+          <h2 className="text-xl font-semibold text-blue-800 mb-4">Quick Access</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {[ 
+              { title: 'Appointments', desc: 'Book or view appointments', icon: '📅' },
+              { title: 'Patient Records', desc: 'Secure medical history', icon: '📁' },
+              { title: 'Billing & Payments', desc: 'View bills and pay online', icon: '💳' },
+              { title: 'Pharmacy & Lab Reports', desc: 'Prescriptions and test results', icon: '🧪' },
+            ].map(card => (
+              <div key={card.title} className="bg-white rounded-2xl shadow hover:shadow-lg transition p-5 flex flex-col gap-2">
+                <span className="text-3xl">{card.icon}</span>
+                <div className="font-semibold text-blue-800">{card.title}</div>
+                <div className="text-gray-500 text-sm">{card.desc}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+        {/* ...existing code... */}
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+          <div className="bg-white rounded-2xl shadow p-6 flex flex-col gap-4">
+            <h3 className="text-lg font-semibold text-blue-800">Hospital at a Glance</h3>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <div className="text-2xl font-bold text-blue-700">500+</div>
+                <div className="text-gray-500">Specialist Doctors</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-blue-700">24/7</div>
+                <div className="text-gray-500">Emergency Services</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-blue-700">10+</div>
+                <div className="text-gray-500">Advanced Departments</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-blue-700">98%</div>
+                <div className="text-gray-500">Patient Satisfaction</div>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-2xl shadow p-6 flex flex-col gap-3">
+            <h3 className="text-lg font-semibold text-blue-800">What Our Patients Say</h3>
+            <p className="text-gray-600 text-sm italic">
+              “ABC Hospital made my surgery journey smooth and stress-free. The staff were caring, and all my reports were available online in seconds.”
+            </p>
+            <div className="text-sm text-gray-500">— Patient Feedback</div>
+          </div>
+          <div className="bg-white rounded-2xl shadow p-6 flex flex-col gap-3">
+            <h3 className="text-lg font-semibold text-blue-800">Latest Updates</h3>
+            <ul className="text-sm text-gray-600 space-y-2">
+              <li>• Free heart health camp – 25th Dec</li>
+              <li>• COVID-19 booster vaccination drive ongoing</li>
+              <li>• New oncology wing inaugurated</li>
             </ul>
-          </section>
-        )}
-        {activeSection === 'appointments' && (
-          <section className="bg-white rounded-lg shadow p-6 max-w-xl mx-auto">
-            <h2 className="text-xl font-semibold mb-4 text-blue-700">Schedule Appointment</h2>
-            <form className="flex flex-col gap-4">
-              <div>
-                <label className="block text-gray-700 mb-1">Select Doctor</label>
-                <select className="w-full border rounded px-3 py-2">
-                  <option>Dr. Alice Smith (Cardiologist)</option>
-                  <option>Dr. Bob Lee (Dermatologist)</option>
-                  <option>Dr. Carol White (Pediatrician)</option>
-                </select>
+          </div>
+        </section>
+        {/* ...existing code... */}
+        <section className="bg-white rounded-2xl shadow p-6 md:p-8">
+          <h2 className="text-xl font-semibold text-blue-800 mb-4">Who Can Use This Portal?</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            {[ 
+              { title: 'Patients', desc: 'Manage appointments, records, and bills in one place.' },
+              { title: 'Doctors', desc: 'Access schedules, patient charts, and clinical data.' },
+              { title: 'Staff / Admin', desc: 'Oversee operations, billing, and analytics.' },
+            ].map(role => (
+              <div key={role.title} className="rounded-xl border border-blue-100 p-4 bg-blue-50/40">
+                <div className="font-semibold text-blue-800 mb-1">{role.title}</div>
+                <div className="text-gray-600 text-sm">{role.desc}</div>
               </div>
-              <div>
-                <label className="block text-gray-700 mb-1">Date</label>
-                <input type="date" className="w-full border rounded px-3 py-2" />
-              </div>
-              <div>
-                <label className="block text-gray-700 mb-1">Time</label>
-                <input type="time" className="w-full border rounded px-3 py-2" />
-              </div>
-              <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">Book Appointment</button>
-            </form>
-          </section>
-        )}
-        {activeSection === 'doctors' && (
-          <section className="bg-white rounded-lg shadow p-6 max-w-5xl mx-auto">
-            <h2 className="text-xl font-semibold mb-6 text-blue-700">Available Doctors</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {/* Example doctor cards */}
-              {[
-                {
-                  name: 'Dr. Alice Smith',
-                  specialization: 'Cardiologist',
-                  description: 'Expert in heart and vascular care with 15+ years of experience.',
-                  photo: 'https://randomuser.me/api/portraits/women/44.jpg',
-                },
-                {
-                  name: 'Dr. Bob Lee',
-                  specialization: 'Dermatologist',
-                  description: 'Specialist in skin, hair, and nail disorders. 10+ years in dermatology.',
-                  photo: 'https://randomuser.me/api/portraits/men/32.jpg',
-                },
-                {
-                  name: 'Dr. Carol White',
-                  specialization: 'Pediatrician',
-                  description: 'Caring for children and adolescents, focusing on preventive care.',
-                  photo: 'https://randomuser.me/api/portraits/women/65.jpg',
-                },
-                {
-                  name: 'Dr. David Kim',
-                  specialization: 'Orthopedic Surgeon',
-                  description: 'Specializes in bone and joint surgery, sports injuries, and trauma.',
-                  photo: 'https://randomuser.me/api/portraits/men/76.jpg',
-                },
-                {
-                  name: 'Dr. Eva Green',
-                  specialization: 'Neurologist',
-                  description: 'Expert in brain and nervous system disorders, epilepsy, and stroke.',
-                  photo: 'https://randomuser.me/api/portraits/women/12.jpg',
-                },
-              ].map((doc, idx) => (
-                <div key={idx} className="bg-blue-50 rounded-lg shadow hover:shadow-lg transition p-4 flex flex-col items-center text-center">
-                  <img src={doc.photo} alt={doc.name} className="w-20 h-20 rounded-full object-cover border-2 border-blue-400 mb-3" />
-                  <div className="font-semibold text-lg text-blue-800">{doc.name}</div>
-                  <div className="text-blue-600 text-sm mb-2">{doc.specialization}</div>
-                  <div className="text-gray-700 text-sm mb-3">{doc.description}</div>
-                  <button className="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700 transition text-sm">View Profile</button>
-                </div>
-              ))}
+            ))}
+          </div>
+        </section>
+        {/* ...existing code... */}
+        <footer className="border-t pt-6 mt-4 text-sm text-gray-600 flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
+          <div>
+            <div className="font-semibold text-blue-800">ABC Hospital</div>
+            <div>123 Health Avenue, City, Country</div>
+            <div>Phone: +1 (234) 567-8900 · Email: info@abchospital.com</div>
+            <div className="text-red-500 font-semibold mt-1">Emergency Hotline: 1990</div>
+          </div>
+          <div className="flex flex-col items-start md:items-end gap-2">
+            <div className="flex gap-3">
+              <button className="text-blue-600 hover:underline">Privacy Policy</button>
+              <button className="text-blue-600 hover:underline">Terms of Service</button>
             </div>
-          </section>
-        )}
+            <div className="flex gap-3 text-blue-500 text-lg">
+              <span aria-label="Facebook" role="img">📘</span>
+              <span aria-label="Twitter" role="img">🐦</span>
+              <span aria-label="Instagram" role="img">📸</span>
+            </div>
+          </div>
+        </footer>
       </main>
     </div>
   );
