@@ -9,19 +9,11 @@ const navLinks = [
 ];
 
 const PatientDashboard: React.FC = () => {
-  const [activeSection, setActiveSection] = useState(navLinks[0].id);
-
-
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
       {/* Navigation bar */}
       <div className="relative">
-        <PatientDashboardNavBar
-          navLinks={navLinks}
-          activeSection={activeSection}
-          setActiveSection={setActiveSection}
-        />
+        <PatientDashboardNavBar navLinks={navLinks} />
       </div>
 
       {/* Landing Page Content */}

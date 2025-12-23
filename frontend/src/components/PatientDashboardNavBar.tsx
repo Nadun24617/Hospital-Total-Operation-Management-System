@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAuth } from '../auth';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface NavLink {
   label: string;
@@ -13,8 +14,15 @@ interface PatientDashboardNavBarProps {
 }
 
 
-const PatientDashboardNavBar: React.FC<PatientDashboardNavBarProps> = ({ navLinks, activeSection, setActiveSection }) => {
+const PatientDashboardNavBar: React.FC<PatientDashboardNavBarProps> = ({ navLinks }) => {
   const { isLoggedIn, user, logout } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  // Determine active section from path
+  let activeSection = 'home';
+  if (location.pathname === '/about') activeSection = 'hospital';
+  else if (location.pathname.includes('appointments')) activeSection = 'appointments';
+  else if (location.pathname.includes('doctors')) activeSection = 'doctors';
     const [showProfilePopup, setShowProfilePopup] = React.useState(false);
 
     // Close popup on outside click
@@ -60,8 +68,9 @@ const PatientDashboardNavBar: React.FC<PatientDashboardNavBarProps> = ({ navLink
           `}
           style={{ boxShadow: activeSection === 'home' ? '0 4px 16px 0 rgba(59,130,246,0.07)' : undefined }}
           onClick={() => {
-            setActiveSection('home');
-            window.location.href = '/'; // Assign landing page
+            if (location.pathname !== '/') {
+              navigate('/');
+            }
           }}
           tabIndex={0}
           aria-current={activeSection === 'home' ? 'page' : undefined}
@@ -80,7 +89,15 @@ const PatientDashboardNavBar: React.FC<PatientDashboardNavBarProps> = ({ navLink
                 : 'text-gray-800 hover:bg-blue-50'}
             `}
             style={{ boxShadow: activeSection === link.id ? '0 4px 16px 0 rgba(59,130,246,0.07)' : undefined }}
-            onClick={() => setActiveSection(link.id)}
+            onClick={() => {
+              if (link.id === 'hospital') {
+                if (location.pathname !== '/about') navigate('/about');
+              } else if (link.id === 'appointments') {
+                // Example: navigate('/appointments');
+              } else if (link.id === 'doctors') {
+                // Example: navigate('/doctors');
+              }
+            }}
             tabIndex={0}
             aria-current={activeSection === link.id ? 'page' : undefined}
           >
