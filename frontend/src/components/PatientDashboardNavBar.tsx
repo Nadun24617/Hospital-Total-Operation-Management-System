@@ -9,8 +9,6 @@ interface NavLink {
 
 interface PatientDashboardNavBarProps {
   navLinks: NavLink[];
-  activeSection: string;
-  setActiveSection: (id: string) => void;
 }
 
 
@@ -95,7 +93,7 @@ const PatientDashboardNavBar: React.FC<PatientDashboardNavBarProps> = ({ navLink
               } else if (link.id === 'appointments') {
                 // Example: navigate('/appointments');
               } else if (link.id === 'doctors') {
-                // Example: navigate('/doctors');
+                if (location.pathname !== '/doctors') navigate('/doctors');
               }
             }}
             tabIndex={0}

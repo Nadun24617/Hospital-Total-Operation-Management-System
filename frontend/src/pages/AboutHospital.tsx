@@ -1,5 +1,6 @@
 import React from 'react';
 import PatientDashboardNavBar from '../components/PatientDashboardNavBar';
+import Footer from '../components/Footer';
 
 const heroImages = [
   '/assets/hospital1.jpg',
@@ -143,6 +144,7 @@ const AboutHospital: React.FC = () => {
           </ul>
         </section>
       </div>
+            <Footer />
     </div>
   );
 };

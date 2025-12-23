@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PatientDashboardNavBar from '../components/PatientDashboardNavBar';
+import Footer from '../components/Footer';
 
 
 const navLinks = [
@@ -107,28 +108,9 @@ const PatientDashboard: React.FC = () => {
               </div>
             ))}
           </div>
-        </section>
-        {/* ...existing code... */}
-        <footer className="border-t pt-6 mt-4 text-sm text-gray-600 flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
-          <div>
-            <div className="font-semibold text-blue-800">ABC Hospital</div>
-            <div>123 Health Avenue, City, Country</div>
-            <div>Phone: +1 (234) 567-8900 · Email: info@abchospital.com</div>
-            <div className="text-red-500 font-semibold mt-1">Emergency Hotline: 1990</div>
-          </div>
-          <div className="flex flex-col items-start md:items-end gap-2">
-            <div className="flex gap-3">
-              <button className="text-blue-600 hover:underline">Privacy Policy</button>
-              <button className="text-blue-600 hover:underline">Terms of Service</button>
-            </div>
-            <div className="flex gap-3 text-blue-500 text-lg">
-              <span aria-label="Facebook" role="img">📘</span>
-              <span aria-label="Twitter" role="img">🐦</span>
-              <span aria-label="Instagram" role="img">📸</span>
-            </div>
-          </div>
-        </footer>
+        </section>  
       </main>
+      <Footer />
     </div>
   );
 };
