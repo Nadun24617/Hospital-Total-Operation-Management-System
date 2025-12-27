@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import PatientDashboardNavBar from '../components/PatientDashboardNavBar';
 import Footer from '../components/Footer';
 
@@ -10,6 +11,16 @@ const navLinks = [
 ];
 
 const PatientDashboard: React.FC = () => {
+  const navigate = useNavigate();
+
+  const quickAccessCards = [
+    { title: 'Appointments', desc: 'Book a new appointment', icon: '📅', onClick: () => navigate('/appointments') },
+    { title: 'My Appointments', desc: 'View and manage bookings', icon: '📋', onClick: () => navigate('/my-appointments') },
+    { title: 'Patient Records', desc: 'Secure medical history', icon: '📁' },
+    { title: 'Billing & Payments', desc: 'View bills and pay online', icon: '💳' },
+    { title: 'Pharmacy & Lab Reports', desc: 'Prescriptions and test results', icon: '🧪' },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
       {/* Navigation bar */}
@@ -40,18 +51,23 @@ const PatientDashboard: React.FC = () => {
         <section>
           <h2 className="text-xl font-semibold text-blue-800 mb-4">Quick Access</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-            {[ 
-              { title: 'Appointments', desc: 'Book or view appointments', icon: '📅' },
-              { title: 'Patient Records', desc: 'Secure medical history', icon: '📁' },
-              { title: 'Billing & Payments', desc: 'View bills and pay online', icon: '💳' },
-              { title: 'Pharmacy & Lab Reports', desc: 'Prescriptions and test results', icon: '🧪' },
-            ].map(card => (
-              <div key={card.title} className="bg-white rounded-2xl shadow hover:shadow-lg transition p-5 flex flex-col gap-2">
-                <span className="text-3xl">{card.icon}</span>
-                <div className="font-semibold text-blue-800">{card.title}</div>
-                <div className="text-gray-500 text-sm">{card.desc}</div>
-              </div>
-            ))}
+            {quickAccessCards.map(card => {
+              const clickable = Boolean(card.onClick);
+              return (
+                <div
+                  key={card.title}
+                  className={
+                    'bg-white rounded-2xl shadow transition p-5 flex flex-col gap-2 ' +
+                    (clickable ? 'hover:shadow-lg cursor-pointer' : '')
+                  }
+                  onClick={card.onClick}
+                >
+                  <span className="text-3xl">{card.icon}</span>
+                  <div className="font-semibold text-blue-800">{card.title}</div>
+                  <div className="text-gray-500 text-sm">{card.desc}</div>
+                </div>
+              );
+            })}
           </div>
         </section>
         {/* ...existing code... */}

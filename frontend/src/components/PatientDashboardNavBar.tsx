@@ -91,7 +91,7 @@ const PatientDashboardNavBar: React.FC<PatientDashboardNavBarProps> = ({ navLink
               if (link.id === 'hospital') {
                 if (location.pathname !== '/about') navigate('/about');
               } else if (link.id === 'appointments') {
-                // Example: navigate('/appointments');
+                if (location.pathname !== '/appointments') navigate('/appointments');
               } else if (link.id === 'doctors') {
                 if (location.pathname !== '/doctors') navigate('/doctors');
               }

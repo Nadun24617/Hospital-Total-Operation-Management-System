@@ -26,7 +26,15 @@ export default function Login() {
         password,
       });
       login(response.data.accessToken, response.data.user);
-      if (response.data.user.role?.toLowerCase() === 'user') {
+      const roleRaw = response.data.user.role;
+      const role = roleRaw?.toLowerCase();
+
+      if (role === 'doctor') {
+        navigate('/doctor-dashboard');
+      } else if (role === 'admin' || role === 'staff' || role === 'nurse') {
+        navigate('/dashboard');
+      } else {
+        // Default/fallback: treat as patient portal
         navigate('/patient-dashboard');
       }
     } catch (err: any) {

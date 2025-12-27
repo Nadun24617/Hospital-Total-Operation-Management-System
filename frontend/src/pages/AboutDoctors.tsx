@@ -151,7 +151,7 @@ const AboutDoctors: React.FC = () => {
         </div>
         {/* Doctor Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredDoctors.map((doc, idx) => (
+          {filteredDoctors.map((doc,) => (
             <div key={doc.name} className="bg-white rounded-2xl shadow p-6 flex flex-col gap-3 items-center">
               <img
                 src={doc.image && doc.image.trim() ? doc.image : defaultDoctorImage}
