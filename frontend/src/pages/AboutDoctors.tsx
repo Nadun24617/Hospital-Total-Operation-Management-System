@@ -95,11 +95,9 @@ const AboutDoctors: React.FC = () => {
   }, [search, sortBy, category, doctors]);
 
   return (
-    <div className="min-h-screen bg-muted">
-      <div className="relative">
-        <PatientDashboardNavBar navLinks={navLinks} />
-      </div>
-      <div className="max-w-6xl mx-auto py-10 px-4">
+    <div className="min-h-screen flex flex-col bg-muted">
+      <PatientDashboardNavBar navLinks={navLinks} />
+      <div className="flex-1 max-w-6xl mx-auto py-10 px-4">
         <h1 className="text-2xl font-semibold text-foreground mb-6">Meet Our Doctors</h1>
         <div className="flex flex-col md:flex-row gap-4 mb-8 items-center">
           <Input
