@@ -3,7 +3,7 @@ import SidePanel from '../components/SidePanel';
 import AdminUserManagement from '../components/AdminUserManagement';
 import DoctorProfiles from '../components/DoctorProfiles';
 import { useAuth } from '../auth';
-
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const baseFeatures = [
   { label: 'Patient Management' },
@@ -47,14 +47,18 @@ export default function Dashboard() {
         activeIndex={active}
       />
       <main className="flex-1 p-8">
-        <h1 className="text-3xl font-bold mb-6">{activeFeature.label}</h1>
-        <div className="bg-white rounded-lg shadow p-6 min-h-[300px]">
-          {activeFeature.label === 'Admin' && <AdminUserManagement />}
-          {activeFeature.label === 'Doctor Profiles' && <DoctorProfiles />}
-          {activeFeature.label !== 'Admin' && activeFeature.label !== 'Doctor Profiles' && (
-            <p>Welcome to the {activeFeature.label} section.</p>
-          )}
-        </div>
+        <Card className="min-h-[300px]">
+          <CardHeader>
+            <CardTitle className="text-3xl">{activeFeature.label}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {activeFeature.label === 'Admin' && <AdminUserManagement />}
+            {activeFeature.label === 'Doctor Profiles' && <DoctorProfiles />}
+            {activeFeature.label !== 'Admin' && activeFeature.label !== 'Doctor Profiles' && (
+              <p className="text-muted-foreground">Welcome to the {activeFeature.label} section.</p>
+            )}
+          </CardContent>
+        </Card>
       </main>
     </div>
   );

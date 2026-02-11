@@ -1,7 +1,7 @@
-
-
 import { useAuth } from '../auth';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 
 interface SidePanelProps {
   items: { label: string; icon?: React.ReactNode; onClick?: () => void }[];
@@ -14,32 +14,36 @@ export default function SidePanel({ items, activeIndex = 0 }: SidePanelProps) {
 
   const handleLogout = () => {
     logout();
-    navigate('/'); // Redirect to landing page
+    navigate('/');
   };
+
   return (
     <aside className="h-screen w-64 bg-white border-r border-gray-200 flex flex-col shadow-sm">
       <div className="p-6 text-2xl font-bold text-primary-700 border-b border-gray-100">Dashboard</div>
-      <nav className="flex-1 p-4 space-y-2">
+      <nav className="flex-1 p-4 space-y-1">
         {items.map((item, idx) => (
-          <button
+          <Button
             key={item.label}
-            className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left transition-colors font-medium hover:bg-primary-50 focus:outline-none focus:bg-primary-100 ${
-              idx === activeIndex ? 'bg-primary-100 text-primary-700' : 'text-gray-700'
+            variant={idx === activeIndex ? 'secondary' : 'ghost'}
+            className={`w-full justify-start gap-3 font-medium ${
+              idx === activeIndex ? 'bg-primary-100 text-primary-700 hover:bg-primary-100' : 'text-gray-700 hover:bg-primary-50'
             }`}
             onClick={item.onClick}
           >
             {item.icon}
             {item.label}
-          </button>
+          </Button>
         ))}
       </nav>
-      <div className="p-4 border-t border-gray-100 mt-auto">
-        <button
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-red-600 font-semibold bg-red-50 hover:bg-red-100 transition-colors"
+      <Separator />
+      <div className="p-4">
+        <Button
+          variant="destructive"
+          className="w-full bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700"
           onClick={handleLogout}
         >
           Logout
-        </button>
+        </Button>
       </div>
     </aside>
   );
