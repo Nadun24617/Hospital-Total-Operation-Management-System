@@ -75,6 +75,19 @@ export class AppointmentService {
       }
     }
 
+    const existingSlot = await this.prisma.appointment.findFirst({
+      where: {
+        doctorId: data.doctorId,
+        date: data.date,
+        timeSlot: data.timeSlot,
+        status: { not: 'CANCELLED' },
+      },
+      select: { id: true },
+    });
+    if (existingSlot) {
+      throw new BadRequestException('Selected time slot is already booked');
+    }
+
     const maxQueue = await this.prisma.appointment.aggregate({
       _max: { queueNumber: true },
       where: { doctorId: data.doctorId, date: data.date },
@@ -83,6 +96,44 @@ export class AppointmentService {
 
     return this.prisma.appointment.create({
       data: { ...data, queueNumber },
+      include: this.includeDoctor,
+    });
+  }
+
+  async findMine(userId: string, filters?: { status?: AppointmentStatus }) {
+    const where: Prisma.AppointmentWhereInput = { userId };
+    if (filters?.status) {
+      where.status = filters.status;
+    }
+
+    return this.prisma.appointment.findMany({
+      where,
+      include: this.includeDoctor,
+      orderBy: [{ date: 'desc' }, { timeSlot: 'asc' }],
+    });
+  }
+
+  async cancelMine(id: number, userId: string) {
+    const appointment = await this.prisma.appointment.findUnique({
+      where: { id },
+      select: { id: true, userId: true, status: true },
+    });
+
+    if (!appointment) {
+      throw new NotFoundException('Appointment not found');
+    }
+
+    if (appointment.userId !== userId) {
+      throw new NotFoundException('Appointment not found');
+    }
+
+    if (appointment.status !== 'UPCOMING') {
+      throw new BadRequestException('Only upcoming appointments can be cancelled');
+    }
+
+    return this.prisma.appointment.update({
+      where: { id },
+      data: { status: 'CANCELLED' },
       include: this.includeDoctor,
     });
   }

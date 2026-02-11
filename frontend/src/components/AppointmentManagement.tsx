@@ -283,7 +283,7 @@ export default function AppointmentManagement() {
         <div className="flex flex-wrap gap-3 mb-4 items-end">
           <div className="space-y-1">
             <Label className="text-xs text-muted-foreground">Status</Label>
-            <Select value={filterStatus} onValueChange={setFilterStatus}>
+            <Select value={filterStatus} onValueChange={(v) => setFilterStatus(v === 'ALL' ? '' : v)}>
               <SelectTrigger className="w-[140px] h-8 text-sm">
                 <SelectValue placeholder="All" />
               </SelectTrigger>
@@ -297,7 +297,7 @@ export default function AppointmentManagement() {
           </div>
           <div className="space-y-1">
             <Label className="text-xs text-muted-foreground">Doctor</Label>
-            <Select value={filterDoctorId} onValueChange={setFilterDoctorId}>
+            <Select value={filterDoctorId} onValueChange={(v) => setFilterDoctorId(v === 'ALL' ? '' : v)}>
               <SelectTrigger className="w-[180px] h-8 text-sm">
                 <SelectValue placeholder="All Doctors" />
               </SelectTrigger>

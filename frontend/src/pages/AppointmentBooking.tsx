@@ -41,16 +41,31 @@ interface ApiDoctor {
 const DEFAULT_TIME_SLOTS = ['09:00', '09:30', '10:00', '10:30', '11:00', '14:00', '14:30', '15:00'];
 const DEFAULT_HOSPITAL_LABEL = 'ABC Hospital';
 
-export type AppointmentStatus = 'UPCOMING' | 'PAST' | 'CANCELLED';
+export type AppointmentStatus = 'UPCOMING' | 'COMPLETED' | 'CANCELLED';
 
-export interface StoredAppointment {
-  id: string;
-  patientId: string | null;
+interface ApiAppointment {
+  id: number;
+  doctorId: number;
+  userId?: string | null;
+  patientName: string;
+  contactNumber: string;
+  reason?: string | null;
+  appointmentType: string;
+  date: string;
+  timeSlot: string;
+  queueNumber: number;
+  status: AppointmentStatus;
+  createdAt: string;
+  doctor?: { fullName: string; specializationId: number };
+}
+
+export interface AppointmentView {
+  id: number;
   patientName: string;
   contactNumber: string;
   reason: string;
   appointmentType: string;
-  doctorId: string;
+  doctorId: number;
   doctorName: string;
   specialization: string;
   department: string;
@@ -63,8 +78,6 @@ export interface StoredAppointment {
 }
 
 type Step = 'selectDoctor' | 'dateTime' | 'detailsForm' | 'confirm' | 'success';
-
-const APPOINTMENTS_KEY = 'appointments';
 
 const AppointmentBooking: React.FC = () => {
   const { isLoggedIn, user, token } = useAuth();
@@ -86,7 +99,9 @@ const AppointmentBooking: React.FC = () => {
   const [contactNumber, setContactNumber] = useState('');
   const [reason, setReason] = useState('');
   const [appointmentType, setAppointmentType] = useState('Consultation');
-  const [createdAppointment, setCreatedAppointment] = useState<StoredAppointment | null>(null);
+  const [createdAppointment, setCreatedAppointment] = useState<AppointmentView | null>(null);
+  const [createLoading, setCreateLoading] = useState(false);
+  const [createError, setCreateError] = useState('');
 
   const selectedDoctor = useMemo(
     () => doctors.find((d) => d.id === selectedDoctorId) || null,
@@ -161,37 +176,60 @@ const AppointmentBooking: React.FC = () => {
   }, []);
 
   const handleConfirm = () => {
-    if (!selectedDoctor || !date || !timeSlot || !patientName || !contactNumber || !appointmentType) {
-      return;
-    }
-    const queueNumber = Math.floor(Math.random() * 50) + 1;
-    const id = `APT-${Date.now()}`;
-    const appointment: StoredAppointment = {
-      id,
-      patientId: user ? user.id : null,
-      patientName,
-      contactNumber,
-      reason,
-      appointmentType,
-      doctorId: String(selectedDoctor.id),
-      doctorName: selectedDoctor.fullName,
-      specialization: specializationName(selectedDoctor.specializationId),
-      department: specializationName(selectedDoctor.specializationId),
-      hospital: DEFAULT_HOSPITAL_LABEL,
-      date,
-      timeSlot,
-      queueNumber,
-      status: 'UPCOMING',
-      createdAt: new Date().toISOString(),
-    };
+    if (!selectedDoctor || !date || !timeSlot || !patientName || !contactNumber || !appointmentType) return;
+    if (createLoading) return;
 
-    const existingRaw = localStorage.getItem(APPOINTMENTS_KEY);
-    const existing: StoredAppointment[] = existingRaw ? JSON.parse(existingRaw) : [];
-    existing.push(appointment);
-    localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(existing));
+    setCreateError('');
+    setCreateLoading(true);
 
-    setCreatedAppointment(appointment);
-    setStep('success');
+    void (async () => {
+      try {
+        const response = await axios.post<ApiAppointment>(
+          `${import.meta.env.VITE_API_URL}/appointments`,
+          {
+            doctorId: selectedDoctor.id,
+            patientName,
+            contactNumber,
+            reason,
+            appointmentType,
+            date,
+            timeSlot,
+          },
+          { headers: authHeaders },
+        );
+
+        const api = response.data;
+        const doctorName = api.doctor?.fullName ?? selectedDoctor.fullName;
+        const specialization = specializationName(api.doctor?.specializationId ?? selectedDoctor.specializationId);
+
+        setCreatedAppointment({
+          id: api.id,
+          patientName: api.patientName,
+          contactNumber: api.contactNumber,
+          reason: api.reason ?? '',
+          appointmentType: api.appointmentType,
+          doctorId: api.doctorId,
+          doctorName,
+          specialization,
+          department: specialization,
+          hospital: DEFAULT_HOSPITAL_LABEL,
+          date: (api.date ?? date).slice(0, 10),
+          timeSlot: api.timeSlot,
+          queueNumber: api.queueNumber,
+          status: api.status,
+          createdAt: api.createdAt,
+        });
+        setStep('success');
+      } catch (err) {
+        if (axios.isAxiosError(err)) {
+          setCreateError(err.response?.data?.message ?? 'Failed to create appointment.');
+        } else {
+          setCreateError('Failed to create appointment.');
+        }
+      } finally {
+        setCreateLoading(false);
+      }
+    })();
   };
 
   const resetForAnother = () => {
@@ -201,6 +239,7 @@ const AppointmentBooking: React.FC = () => {
     setTimeSlot('');
     setReason('');
     setAppointmentType('Consultation');
+    setCreateError('');
   };
 
   const stepBadge = (label: string, active: boolean, done: boolean) => (
@@ -435,6 +474,9 @@ const AppointmentBooking: React.FC = () => {
       <Card className="p-6 md:p-8">
         {renderStepHeader()}
         <h2 className="text-2xl font-bold text-foreground mb-4">Confirm Appointment</h2>
+        {createError && (
+          <Card className="p-4 mb-5 border-red-200 bg-red-50 text-red-700 text-sm">{createError}</Card>
+        )}
         <div className="grid md:grid-cols-2 gap-6 mb-6 text-sm">
           <div className="space-y-2">
             <h3 className="font-semibold text-foreground mb-1">Doctor</h3>
@@ -484,8 +526,9 @@ const AppointmentBooking: React.FC = () => {
           <Button
             className="bg-primary text-white hover:bg-primary/90 font-semibold px-6"
             onClick={handleConfirm}
+            disabled={createLoading}
           >
-            Confirm Appointment
+            {createLoading ? 'Booking...' : 'Confirm Appointment'}
           </Button>
         </div>
       </Card>

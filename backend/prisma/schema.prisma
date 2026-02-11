@@ -21,6 +21,7 @@ enum UserStatus {
   SUSPENDED
 }
 
+
 model User {
   id           String     @id @default(cuid()) @db.VarChar(36)
   firstName    String     @db.VarChar(50)
@@ -36,6 +37,7 @@ model User {
   doctor       Doctor?
   appointments Appointment[]
 }
+
 
 model Doctor {
   id               Int       @id @default(autoincrement()) @map("doctor_id")
@@ -78,4 +80,7 @@ model Appointment {
 
   doctor Doctor @relation(fields: [doctorId], references: [id])
   user   User?  @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([doctorId, date])
 }
