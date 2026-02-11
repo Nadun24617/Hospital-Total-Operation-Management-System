@@ -49,7 +49,7 @@ export default function Dashboard() {
       <main className="flex-1 p-8">
         <Card className="min-h-[300px]">
           <CardHeader>
-            <CardTitle className="text-3xl">{activeFeature.label}</CardTitle>
+            <CardTitle className="text-2xl font-semibold">{activeFeature.label}</CardTitle>
           </CardHeader>
           <CardContent>
             {activeFeature.label === 'Admin' && <AdminUserManagement />}
