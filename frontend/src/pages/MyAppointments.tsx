@@ -4,6 +4,9 @@ import Footer from '../components/Footer';
 import { useAuth } from '../auth';
 import { useNavigate } from 'react-router-dom';
 import type { StoredAppointment, AppointmentStatus } from './AppointmentBooking';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 const navLinks = [
   { label: 'About Us', id: 'hospital' },
@@ -19,10 +22,16 @@ const statusLabel: Record<AppointmentStatus, string> = {
   CANCELLED: 'Cancelled',
 };
 
-const statusStyle: Record<AppointmentStatus, string> = {
-  UPCOMING: 'bg-blue-50 text-blue-700 border-blue-200',
-  PAST: 'bg-green-50 text-green-700 border-green-200',
-  CANCELLED: 'bg-red-50 text-red-600 border-red-200',
+const statusVariant: Record<AppointmentStatus, 'default' | 'secondary' | 'destructive'> = {
+  UPCOMING: 'default',
+  PAST: 'secondary',
+  CANCELLED: 'destructive',
+};
+
+const statusBadgeClass: Record<AppointmentStatus, string> = {
+  UPCOMING: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-50',
+  PAST: 'bg-green-50 text-green-700 border-green-200 hover:bg-green-50',
+  CANCELLED: 'bg-red-50 text-red-600 border-red-200 hover:bg-red-50',
 };
 
 const MyAppointments: React.FC = () => {
@@ -40,7 +49,6 @@ const MyAppointments: React.FC = () => {
     const mine = all.filter((a) => a.patientId === user.id);
 
     const now = new Date();
-    // Derive PAST for already elapsed upcoming appointments
     mine.forEach((a) => {
       if (a.status === 'UPCOMING') {
         const dt = new Date(`${a.date}T${a.timeSlot}:00`);
@@ -50,7 +58,6 @@ const MyAppointments: React.FC = () => {
       }
     });
 
-    // Persist derived updates back
     const merged = all.map((a) => {
       const updated = mine.find((m) => m.id === a.id);
       return updated ?? a;
@@ -85,16 +92,16 @@ const MyAppointments: React.FC = () => {
           <PatientDashboardNavBar navLinks={navLinks} />
         </div>
         <main className="max-w-3xl mx-auto mt-12 px-4">
-          <div className="bg-white rounded-3xl shadow p-8 flex flex-col items-center text-center gap-4">
+          <Card className="rounded-3xl shadow p-8 flex flex-col items-center text-center gap-4">
             <h1 className="text-2xl font-bold text-blue-800">My Appointments</h1>
             <p className="text-gray-600">Please log in to view your appointments.</p>
-            <button
-              className="mt-2 px-6 py-2 rounded-full bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
+            <Button
+              className="mt-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 font-semibold px-6"
               onClick={() => navigate('/login')}
             >
               Go to Login
-            </button>
-          </div>
+            </Button>
+          </Card>
         </main>
         <Footer />
       </div>
@@ -102,18 +109,19 @@ const MyAppointments: React.FC = () => {
   }
 
   const renderAppointmentCard = (a: StoredAppointment) => (
-    <div
+    <Card
       key={a.id}
-      className="bg-white rounded-2xl shadow p-5 flex flex-col md:flex-row justify-between gap-4 items-start md:items-center"
+      className="rounded-2xl p-5 flex flex-col md:flex-row justify-between gap-4 items-start md:items-center"
     >
       <div className="flex-1">
         <div className="flex flex-wrap items-center gap-2 mb-1">
           <h3 className="font-semibold text-blue-800">{a.doctorName}</h3>
-          <span
-            className={`px-2 py-0.5 rounded-full text-[11px] border ${statusStyle[a.status]}`}
+          <Badge
+            variant={statusVariant[a.status]}
+            className={statusBadgeClass[a.status]}
           >
             {statusLabel[a.status]}
-          </span>
+          </Badge>
         </div>
         <p className="text-blue-500 text-sm mb-1">{a.specialization}</p>
         <p className="text-gray-600 text-sm mb-1">
@@ -126,36 +134,42 @@ const MyAppointments: React.FC = () => {
         <div className="text-gray-500">Appointment ID: {a.id}</div>
         <div className="flex flex-wrap gap-2 justify-end">
           {a.status === 'UPCOMING' && (
-            <button
-              className="px-3 py-1 rounded-full border border-red-200 text-red-600 bg-white hover:bg-red-50"
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-full border-red-200 text-red-600 hover:bg-red-50"
               onClick={() => updateAppointmentStatus(a.id, 'CANCELLED')}
             >
               Cancel
-            </button>
+            </Button>
           )}
           {a.status === 'UPCOMING' && (
-            <button
-              className="px-3 py-1 rounded-full border border-blue-200 text-blue-700 bg-white hover:bg-blue-50"
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-full border-blue-200 text-blue-700 hover:bg-blue-50"
               onClick={() =>
                 window.alert('Reschedule flow can be implemented to reopen booking with this appointment pre-filled.')
               }
             >
               Reschedule
-            </button>
+            </Button>
           )}
           {a.status === 'PAST' && (
-            <button
-              className="px-3 py-1 rounded-full border border-blue-200 text-blue-700 bg-white hover:bg-blue-50"
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-full border-blue-200 text-blue-700 hover:bg-blue-50"
               onClick={() =>
                 window.alert('Consultation summary view can be implemented once backend data is available.')
               }
             >
               View summary
-            </button>
+            </Button>
           )}
         </div>
       </div>
-    </div>
+    </Card>
   );
 
   return (
@@ -164,27 +178,27 @@ const MyAppointments: React.FC = () => {
         <PatientDashboardNavBar navLinks={navLinks} />
       </div>
       <main className="max-w-6xl mx-auto mt-8 px-4 pb-10 space-y-8">
-        <section className="bg-white rounded-3xl shadow p-6 md:p-8">
+        <Card className="rounded-3xl shadow p-6 md:p-8">
           <h1 className="text-2xl font-bold text-blue-800 mb-2">My Appointments</h1>
           <p className="text-gray-600 text-sm mb-4">
             View and manage your upcoming, past and cancelled appointments.
           </p>
-        </section>
+        </Card>
 
         <section className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold text-blue-800">Upcoming appointments</h2>
-            <button
-              className="px-4 py-1.5 rounded-full bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700"
+            <Button
+              className="rounded-full bg-blue-600 text-white hover:bg-blue-700 text-sm font-semibold"
               onClick={() => navigate('/appointments')}
             >
               Book new appointment
-            </button>
+            </Button>
           </div>
           {upcoming.length === 0 ? (
-            <div className="bg-white rounded-2xl shadow p-5 text-sm text-gray-500">
+            <Card className="rounded-2xl p-5 text-sm text-gray-500">
               You have no upcoming appointments.
-            </div>
+            </Card>
           ) : (
             <div className="space-y-3">{upcoming.map(renderAppointmentCard)}</div>
           )}
@@ -193,9 +207,9 @@ const MyAppointments: React.FC = () => {
         <section className="space-y-3">
           <h2 className="text-xl font-semibold text-blue-800">Past appointments</h2>
           {past.length === 0 ? (
-            <div className="bg-white rounded-2xl shadow p-5 text-sm text-gray-500">
+            <Card className="rounded-2xl p-5 text-sm text-gray-500">
               No completed appointments yet.
-            </div>
+            </Card>
           ) : (
             <div className="space-y-3">{past.map(renderAppointmentCard)}</div>
           )}
@@ -204,9 +218,9 @@ const MyAppointments: React.FC = () => {
         <section className="space-y-3">
           <h2 className="text-xl font-semibold text-blue-800">Cancelled appointments</h2>
           {cancelled.length === 0 ? (
-            <div className="bg-white rounded-2xl shadow p-5 text-sm text-gray-500">
+            <Card className="rounded-2xl p-5 text-sm text-gray-500">
               No cancelled appointments.
-            </div>
+            </Card>
           ) : (
             <div className="space-y-3">{cancelled.map(renderAppointmentCard)}</div>
           )}
