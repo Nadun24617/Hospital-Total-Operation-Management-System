@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Check } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -125,13 +126,13 @@ const AppointmentBooking: React.FC = () => {
           <PatientDashboardNavBar navLinks={navLinks} />
         </div>
         <main className="max-w-3xl mx-auto mt-12 px-4">
-          <Card className="rounded-3xl shadow p-8 flex flex-col items-center text-center gap-4">
-            <h1 className="text-2xl font-bold text-blue-800">Appointment Booking</h1>
-            <p className="text-gray-600">
+          <Card className="p-8 flex flex-col items-center text-center gap-4">
+            <h1 className="text-2xl font-bold text-foreground">Appointment Booking</h1>
+            <p className="text-muted-foreground">
               Please log in to book an appointment and to auto-fill your patient details.
             </p>
             <Button
-              className="mt-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6"
+              className="mt-2 bg-primary hover:bg-primary/90 text-white font-semibold px-6"
               onClick={() => navigate('/login')}
             >
               Go to Login
@@ -197,19 +198,19 @@ const AppointmentBooking: React.FC = () => {
       className={
         'flex items-center gap-2 px-3 py-1 text-xs md:text-sm ' +
         (active
-          ? 'bg-blue-600 text-white shadow hover:bg-blue-600'
+          ? 'bg-primary text-primary-foreground hover:bg-primary'
           : done
-          ? 'bg-blue-100 text-blue-700 hover:bg-blue-100'
-          : 'bg-gray-100 text-gray-500')
+          ? 'bg-accent text-foreground hover:bg-accent'
+          : 'bg-muted text-muted-foreground')
       }
     >
       <span
         className={
           'w-5 h-5 flex items-center justify-center rounded-full border text-[10px] ' +
-          (active || done ? 'border-white bg-white text-blue-600' : 'border-gray-300 text-gray-500')
+          (active || done ? 'border-white bg-white text-primary' : 'border-gray-300 text-muted-foreground')
         }
       >
-        {done ? '✓' : label.charAt(0)}
+        {done ? <Check className="h-3 w-3" /> : label.charAt(0)}
       </span>
       <span>{label}</span>
     </Badge>
@@ -226,10 +227,10 @@ const AppointmentBooking: React.FC = () => {
   );
 
   const renderDoctorSelection = () => (
-    <Card className="rounded-3xl shadow p-6 md:p-8">
+    <Card className="p-6 md:p-8">
       {renderStepHeader()}
-      <h1 className="text-2xl font-bold text-blue-800 mb-2">Choose a Doctor</h1>
-      <p className="text-gray-600 mb-6 text-sm md:text-base">
+      <h1 className="text-2xl font-bold text-foreground mb-2">Choose a Doctor</h1>
+      <p className="text-muted-foreground mb-6 text-sm md:text-base">
         Select a doctor for your appointment. You can view their specialization and department before proceeding.
       </p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -237,18 +238,18 @@ const AppointmentBooking: React.FC = () => {
           <Card
             key={doc.id}
             className={
-              'text-left rounded-2xl hover:shadow-md transition p-4 flex flex-col gap-2 cursor-pointer ' +
-              (selectedDoctorId === doc.id ? 'border-blue-400' : 'border-blue-100')
+              'text-left hover:border-primary/40 transition p-4 flex flex-col gap-2 cursor-pointer ' +
+              (selectedDoctorId === doc.id ? 'border-primary' : 'border-border')
             }
             onClick={() => {
               setSelectedDoctorId(doc.id);
               setStep('dateTime');
             }}
           >
-            <div className="font-semibold text-blue-800">{doc.name}</div>
-            <div className="text-blue-500 text-sm">{doc.specialization}</div>
-            <div className="text-gray-500 text-xs">{doc.department}</div>
-            <div className="text-gray-500 text-xs mt-1 line-clamp-3">{doc.description}</div>
+            <div className="font-semibold text-foreground">{doc.name}</div>
+            <div className="text-primary text-sm">{doc.specialization}</div>
+            <div className="text-muted-foreground text-xs">{doc.department}</div>
+            <div className="text-muted-foreground text-xs mt-1 line-clamp-3">{doc.description}</div>
           </Card>
         ))}
       </div>
@@ -258,18 +259,18 @@ const AppointmentBooking: React.FC = () => {
   const renderDateTimeSelection = () => {
     if (!selectedDoctor) return null;
     return (
-      <Card className="rounded-3xl shadow p-6 md:p-8">
+      <Card className="p-6 md:p-8">
         {renderStepHeader()}
         <div className="flex flex-col md:flex-row gap-6 mb-6">
           <div className="flex-1">
-            <h2 className="text-xl font-bold text-blue-800 mb-1">{selectedDoctor.name}</h2>
-            <div className="text-blue-500 text-sm mb-1">{selectedDoctor.specialization}</div>
-            <div className="text-gray-500 text-sm mb-2">{selectedDoctor.department}</div>
-            <p className="text-gray-600 text-sm">{selectedDoctor.description}</p>
-            <p className="text-gray-500 text-xs mt-2">{selectedDoctor.hospital}</p>
+            <h2 className="text-xl font-bold text-foreground mb-1">{selectedDoctor.name}</h2>
+            <div className="text-primary text-sm mb-1">{selectedDoctor.specialization}</div>
+            <div className="text-muted-foreground text-sm mb-2">{selectedDoctor.department}</div>
+            <p className="text-muted-foreground text-sm">{selectedDoctor.description}</p>
+            <p className="text-muted-foreground text-xs mt-2">{selectedDoctor.hospital}</p>
           </div>
-          <Card className="flex-1 bg-blue-50/60 rounded-2xl p-4 text-sm text-gray-600 border-blue-100">
-            <h3 className="font-semibold text-blue-700 mb-2">Appointment Info</h3>
+          <Card className="flex-1 bg-muted p-4 text-sm text-muted-foreground border-border">
+            <h3 className="font-semibold text-foreground mb-2">Appointment Info</h3>
             <ul className="list-disc pl-4 space-y-1">
               <li>Consultations are usually 15–20 minutes.</li>
               <li>Please arrive at least 15 minutes before your time slot.</li>
@@ -280,7 +281,7 @@ const AppointmentBooking: React.FC = () => {
 
         <div className="grid md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label className="text-blue-800">Select Date</Label>
+            <Label className="text-foreground">Select Date</Label>
             <Input
               type="date"
               min={minDate}
@@ -289,7 +290,7 @@ const AppointmentBooking: React.FC = () => {
             />
           </div>
           <div className="space-y-2">
-            <Label className="text-blue-800">Select Time Slot</Label>
+            <Label className="text-foreground">Select Time Slot</Label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {selectedDoctor.availableSlots.map((slot) => (
                 <Button
@@ -298,8 +299,8 @@ const AppointmentBooking: React.FC = () => {
                   variant={timeSlot === slot ? 'default' : 'outline'}
                   className={
                     timeSlot === slot
-                      ? 'bg-blue-600 text-white hover:bg-blue-700 shadow'
-                      : 'border-blue-200 text-gray-700 hover:bg-blue-50'
+                      ? 'bg-primary text-white hover:bg-primary/90'
+                      : 'border-border text-gray-700 hover:bg-accent'
                   }
                   onClick={() => setTimeSlot(slot)}
                 >
@@ -313,13 +314,13 @@ const AppointmentBooking: React.FC = () => {
         <div className="flex justify-between mt-8">
           <Button
             variant="outline"
-            className="rounded-full border-blue-200 text-blue-600 hover:bg-blue-50"
+            className="border-border text-primary hover:bg-accent"
             onClick={() => setStep('selectDoctor')}
           >
             Back to doctors
           </Button>
           <Button
-            className="rounded-full bg-blue-600 text-white hover:bg-blue-700 font-semibold px-5"
+            className="bg-primary text-white hover:bg-primary/90 font-semibold px-5"
             disabled={!date || !timeSlot}
             onClick={() => setStep('detailsForm')}
           >
@@ -331,15 +332,15 @@ const AppointmentBooking: React.FC = () => {
   };
 
   const renderDetailsForm = () => (
-    <Card className="rounded-3xl shadow p-6 md:p-8">
+    <Card className="p-6 md:p-8">
       {renderStepHeader()}
-      <h2 className="text-2xl font-bold text-blue-800 mb-2">Appointment Details</h2>
-      <p className="text-gray-600 text-sm mb-6">
+      <h2 className="text-2xl font-bold text-foreground mb-2">Appointment Details</h2>
+      <p className="text-muted-foreground text-sm mb-6">
         Your basic information is auto-filled from your profile. You can update it if needed.
       </p>
       <div className="grid md:grid-cols-2 gap-6 mb-6">
         <div className="space-y-2">
-          <Label className="text-blue-800">Patient name</Label>
+          <Label className="text-foreground">Patient name</Label>
           <Input
             type="text"
             value={patientName}
@@ -347,7 +348,7 @@ const AppointmentBooking: React.FC = () => {
           />
         </div>
         <div className="space-y-2">
-          <Label className="text-blue-800">Contact number</Label>
+          <Label className="text-foreground">Contact number</Label>
           <Input
             type="tel"
             value={contactNumber}
@@ -355,7 +356,7 @@ const AppointmentBooking: React.FC = () => {
           />
         </div>
         <div className="space-y-2">
-          <Label className="text-blue-800">Appointment type</Label>
+          <Label className="text-foreground">Appointment type</Label>
           <Select value={appointmentType} onValueChange={setAppointmentType}>
             <SelectTrigger>
               <SelectValue />
@@ -368,7 +369,7 @@ const AppointmentBooking: React.FC = () => {
           </Select>
         </div>
         <div className="space-y-2">
-          <Label className="text-blue-800">Reason for visit (optional)</Label>
+          <Label className="text-foreground">Reason for visit (optional)</Label>
           <Textarea
             value={reason}
             onChange={(e) => setReason(e.target.value)}
@@ -380,13 +381,13 @@ const AppointmentBooking: React.FC = () => {
       <div className="flex justify-between mt-4">
         <Button
           variant="outline"
-          className="rounded-full border-blue-200 text-blue-600 hover:bg-blue-50"
+          className="border-border text-primary hover:bg-accent"
           onClick={() => setStep('dateTime')}
         >
           Back
         </Button>
         <Button
-          className="rounded-full bg-blue-600 text-white hover:bg-blue-700 font-semibold px-5"
+          className="bg-primary text-white hover:bg-primary/90 font-semibold px-5"
           disabled={!patientName || !contactNumber || !appointmentType}
           onClick={() => setStep('confirm')}
         >
@@ -403,35 +404,35 @@ const AppointmentBooking: React.FC = () => {
     const queuePreview = 'Will be assigned on confirm';
 
     return (
-      <Card className="rounded-3xl shadow p-6 md:p-8">
+      <Card className="p-6 md:p-8">
         {renderStepHeader()}
-        <h2 className="text-2xl font-bold text-blue-800 mb-4">Confirm Appointment</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-4">Confirm Appointment</h2>
         <div className="grid md:grid-cols-2 gap-6 mb-6 text-sm">
           <div className="space-y-2">
-            <h3 className="font-semibold text-blue-700 mb-1">Doctor</h3>
+            <h3 className="font-semibold text-foreground mb-1">Doctor</h3>
             <p className="text-gray-700">{selectedDoctor.name}</p>
-            <p className="text-blue-500">{selectedDoctor.specialization}</p>
-            <p className="text-gray-500">{selectedDoctor.department}</p>
-            <p className="text-gray-500 text-xs mt-1">{selectedDoctor.hospital}</p>
+            <p className="text-primary">{selectedDoctor.specialization}</p>
+            <p className="text-muted-foreground">{selectedDoctor.department}</p>
+            <p className="text-muted-foreground text-xs mt-1">{selectedDoctor.hospital}</p>
           </div>
           <div className="space-y-2">
-            <h3 className="font-semibold text-blue-700 mb-1">Appointment</h3>
+            <h3 className="font-semibold text-foreground mb-1">Appointment</h3>
             <p className="text-gray-700">Date: {displayDate}</p>
             <p className="text-gray-700">Time: {displayTime}</p>
             <p className="text-gray-700">Type: {appointmentType}</p>
-            <p className="text-gray-500 text-xs">Queue number: {queuePreview}</p>
+            <p className="text-muted-foreground text-xs">Queue number: {queuePreview}</p>
           </div>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6 mb-6 text-sm">
           <div className="space-y-2">
-            <h3 className="font-semibold text-blue-700 mb-1">Patient</h3>
+            <h3 className="font-semibold text-foreground mb-1">Patient</h3>
             <p className="text-gray-700">{patientName}</p>
             <p className="text-gray-700">{contactNumber}</p>
           </div>
           <div className="space-y-2">
-            <h3 className="font-semibold text-blue-700 mb-1">Reason</h3>
-            <p className="text-gray-600 min-h-[3rem]">{reason || 'Not specified'}</p>
+            <h3 className="font-semibold text-foreground mb-1">Reason</h3>
+            <p className="text-muted-foreground min-h-[3rem]">{reason || 'Not specified'}</p>
           </div>
         </div>
 
@@ -439,21 +440,21 @@ const AppointmentBooking: React.FC = () => {
           <div className="flex gap-2">
             <Button
               variant="outline"
-              className="rounded-full border-blue-200 text-blue-600 hover:bg-blue-50"
+              className="border-border text-primary hover:bg-accent"
               onClick={() => setStep('detailsForm')}
             >
               Edit details
             </Button>
             <Button
               variant="outline"
-              className="rounded-full border-red-200 text-red-600 hover:bg-red-50"
+              className="border-red-200 text-red-600 hover:bg-red-50"
               onClick={() => navigate('/patient-dashboard')}
             >
               Cancel booking
             </Button>
           </div>
           <Button
-            className="rounded-full bg-blue-600 text-white hover:bg-blue-700 font-semibold px-6"
+            className="bg-primary text-white hover:bg-primary/90 font-semibold px-6"
             onClick={handleConfirm}
           >
             Confirm Appointment
@@ -466,19 +467,19 @@ const AppointmentBooking: React.FC = () => {
   const renderSuccess = () => {
     if (!createdAppointment) return null;
     return (
-      <Card className="rounded-3xl shadow p-6 md:p-8 text-center">
+      <Card className="p-6 md:p-8 text-center">
         {renderStepHeader()}
         <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-3xl">
-            ✓
+          <div className="w-14 h-14 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
+            <Check className="h-6 w-6" />
           </div>
-          <h2 className="text-2xl font-bold text-blue-800">Booking Successful</h2>
-          <p className="text-gray-600 text-sm max-w-md">
+          <h2 className="text-2xl font-bold text-foreground">Booking Successful</h2>
+          <p className="text-muted-foreground text-sm max-w-md">
             Your appointment has been successfully booked. Please arrive at the hospital at least 15 minutes before your selected time.
           </p>
           <div className="mt-4 grid md:grid-cols-2 gap-4 text-sm text-left w-full max-w-xl">
-            <Card className="bg-blue-50 rounded-2xl p-4 border-blue-100">
-              <h3 className="font-semibold text-blue-700 mb-1">Appointment</h3>
+            <Card className="bg-muted p-4">
+              <h3 className="font-semibold text-foreground mb-1">Appointment</h3>
               <p className="text-gray-700">ID: {createdAppointment.id}</p>
               <p className="text-gray-700">
                 Date & time: {createdAppointment.date} at {createdAppointment.timeSlot}
@@ -486,8 +487,8 @@ const AppointmentBooking: React.FC = () => {
               <p className="text-gray-700">Doctor: {createdAppointment.doctorName}</p>
               <p className="text-gray-700">Queue number: {createdAppointment.queueNumber}</p>
             </Card>
-            <Card className="bg-blue-50 rounded-2xl p-4 border-blue-100">
-              <h3 className="font-semibold text-blue-700 mb-1">Instructions</h3>
+            <Card className="bg-muted p-4">
+              <h3 className="font-semibold text-foreground mb-1">Instructions</h3>
               <ul className="list-disc pl-4 space-y-1 text-gray-700">
                 <li>Arrive 15 minutes before your scheduled time.</li>
                 <li>Bring your previous prescriptions and reports if available.</li>
@@ -498,21 +499,21 @@ const AppointmentBooking: React.FC = () => {
 
           <div className="flex flex-wrap gap-3 justify-center mt-6">
             <Button
-              className="rounded-full bg-blue-600 text-white hover:bg-blue-700 font-semibold px-5"
+              className="bg-primary text-white hover:bg-primary/90 font-semibold px-5"
               onClick={() => navigate('/my-appointments')}
             >
               View appointment
             </Button>
             <Button
               variant="outline"
-              className="rounded-full border-blue-200 text-blue-600 hover:bg-blue-50 font-semibold px-5"
+              className="border-border text-primary hover:bg-accent font-semibold px-5"
               onClick={() => window.alert('Download as PDF can be implemented here.')}
             >
               Download confirmation (PDF)
             </Button>
             <Button
               variant="outline"
-              className="rounded-full border-green-200 text-green-700 hover:bg-green-50 font-semibold px-5"
+              className="border-green-200 text-green-700 hover:bg-green-50 font-semibold px-5"
               onClick={resetForAnother}
             >
               Book another appointment

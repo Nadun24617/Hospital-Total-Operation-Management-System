@@ -29,8 +29,8 @@ const statusVariant: Record<AppointmentStatus, 'default' | 'secondary' | 'destru
 };
 
 const statusBadgeClass: Record<AppointmentStatus, string> = {
-  UPCOMING: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-50',
-  PAST: 'bg-green-50 text-green-700 border-green-200 hover:bg-green-50',
+  UPCOMING: 'bg-sky-50 text-sky-700 border-sky-200 hover:bg-sky-50',
+  PAST: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-50',
   CANCELLED: 'bg-red-50 text-red-600 border-red-200 hover:bg-red-50',
 };
 
@@ -92,11 +92,11 @@ const MyAppointments: React.FC = () => {
           <PatientDashboardNavBar navLinks={navLinks} />
         </div>
         <main className="max-w-3xl mx-auto mt-12 px-4">
-          <Card className="rounded-3xl shadow p-8 flex flex-col items-center text-center gap-4">
-            <h1 className="text-2xl font-bold text-blue-800">My Appointments</h1>
-            <p className="text-gray-600">Please log in to view your appointments.</p>
+          <Card className="p-8 flex flex-col items-center text-center gap-4">
+            <h1 className="text-2xl font-semibold text-foreground">My Appointments</h1>
+            <p className="text-muted-foreground">Please log in to view your appointments.</p>
             <Button
-              className="mt-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 font-semibold px-6"
+              className="mt-2 bg-primary text-white hover:bg-primary/90 font-semibold px-6"
               onClick={() => navigate('/login')}
             >
               Go to Login
@@ -111,11 +111,11 @@ const MyAppointments: React.FC = () => {
   const renderAppointmentCard = (a: StoredAppointment) => (
     <Card
       key={a.id}
-      className="rounded-2xl p-5 flex flex-col md:flex-row justify-between gap-4 items-start md:items-center"
+      className="p-5 flex flex-col md:flex-row justify-between gap-4 items-start md:items-center"
     >
       <div className="flex-1">
         <div className="flex flex-wrap items-center gap-2 mb-1">
-          <h3 className="font-semibold text-blue-800">{a.doctorName}</h3>
+          <h3 className="font-semibold text-foreground">{a.doctorName}</h3>
           <Badge
             variant={statusVariant[a.status]}
             className={statusBadgeClass[a.status]}
@@ -123,21 +123,21 @@ const MyAppointments: React.FC = () => {
             {statusLabel[a.status]}
           </Badge>
         </div>
-        <p className="text-blue-500 text-sm mb-1">{a.specialization}</p>
-        <p className="text-gray-600 text-sm mb-1">
+        <p className="text-primary text-sm mb-1">{a.specialization}</p>
+        <p className="text-muted-foreground text-sm mb-1">
           {a.date} at {a.timeSlot}
         </p>
-        <p className="text-gray-500 text-xs mb-1">{a.hospital} • {a.department}</p>
-        <p className="text-gray-500 text-xs">Queue number: {a.queueNumber}</p>
+        <p className="text-muted-foreground text-xs mb-1">{a.hospital} • {a.department}</p>
+        <p className="text-muted-foreground text-xs">Queue number: {a.queueNumber}</p>
       </div>
       <div className="flex flex-col items-end gap-2 text-xs md:text-sm">
-        <div className="text-gray-500">Appointment ID: {a.id}</div>
+        <div className="text-muted-foreground">Appointment ID: {a.id}</div>
         <div className="flex flex-wrap gap-2 justify-end">
           {a.status === 'UPCOMING' && (
             <Button
               variant="outline"
               size="sm"
-              className="rounded-full border-red-200 text-red-600 hover:bg-red-50"
+              className="border-red-200 text-red-600 hover:bg-red-50"
               onClick={() => updateAppointmentStatus(a.id, 'CANCELLED')}
             >
               Cancel
@@ -147,7 +147,7 @@ const MyAppointments: React.FC = () => {
             <Button
               variant="outline"
               size="sm"
-              className="rounded-full border-blue-200 text-blue-700 hover:bg-blue-50"
+              className="border-border text-foreground hover:bg-accent"
               onClick={() =>
                 window.alert('Reschedule flow can be implemented to reopen booking with this appointment pre-filled.')
               }
@@ -159,7 +159,7 @@ const MyAppointments: React.FC = () => {
             <Button
               variant="outline"
               size="sm"
-              className="rounded-full border-blue-200 text-blue-700 hover:bg-blue-50"
+              className="border-border text-foreground hover:bg-accent"
               onClick={() =>
                 window.alert('Consultation summary view can be implemented once backend data is available.')
               }
@@ -178,25 +178,25 @@ const MyAppointments: React.FC = () => {
         <PatientDashboardNavBar navLinks={navLinks} />
       </div>
       <main className="max-w-6xl mx-auto mt-8 px-4 pb-10 space-y-8">
-        <Card className="rounded-3xl shadow p-6 md:p-8">
-          <h1 className="text-2xl font-bold text-blue-800 mb-2">My Appointments</h1>
-          <p className="text-gray-600 text-sm mb-4">
+        <Card className="p-6 md:p-8">
+          <h1 className="text-2xl font-semibold text-foreground mb-2">My Appointments</h1>
+          <p className="text-muted-foreground text-sm mb-4">
             View and manage your upcoming, past and cancelled appointments.
           </p>
         </Card>
 
         <section className="space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-blue-800">Upcoming appointments</h2>
+            <h2 className="text-lg font-semibold text-foreground">Upcoming appointments</h2>
             <Button
-              className="rounded-full bg-blue-600 text-white hover:bg-blue-700 text-sm font-semibold"
+              className="bg-primary text-white hover:bg-primary/90 text-sm font-semibold"
               onClick={() => navigate('/appointments')}
             >
               Book new appointment
             </Button>
           </div>
           {upcoming.length === 0 ? (
-            <Card className="rounded-2xl p-5 text-sm text-gray-500">
+            <Card className="p-5 text-sm text-muted-foreground">
               You have no upcoming appointments.
             </Card>
           ) : (
@@ -205,9 +205,9 @@ const MyAppointments: React.FC = () => {
         </section>
 
         <section className="space-y-3">
-          <h2 className="text-xl font-semibold text-blue-800">Past appointments</h2>
+          <h2 className="text-lg font-semibold text-foreground">Past appointments</h2>
           {past.length === 0 ? (
-            <Card className="rounded-2xl p-5 text-sm text-gray-500">
+            <Card className="p-5 text-sm text-muted-foreground">
               No completed appointments yet.
             </Card>
           ) : (
@@ -216,9 +216,9 @@ const MyAppointments: React.FC = () => {
         </section>
 
         <section className="space-y-3">
-          <h2 className="text-xl font-semibold text-blue-800">Cancelled appointments</h2>
+          <h2 className="text-lg font-semibold text-foreground">Cancelled appointments</h2>
           {cancelled.length === 0 ? (
-            <Card className="rounded-2xl p-5 text-sm text-gray-500">
+            <Card className="p-5 text-sm text-muted-foreground">
               No cancelled appointments.
             </Card>
           ) : (
