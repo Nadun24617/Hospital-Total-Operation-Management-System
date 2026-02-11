@@ -100,7 +100,7 @@ const AboutDoctors: React.FC = () => {
         <PatientDashboardNavBar navLinks={navLinks} />
       </div>
       <div className="max-w-6xl mx-auto py-10 px-4">
-        <h1 className="text-3xl font-bold text-blue-800 mb-6">Meet Our Doctors</h1>
+        <h1 className="text-2xl font-semibold text-foreground mb-6">Meet Our Doctors</h1>
         <div className="flex flex-col md:flex-row gap-4 mb-8 items-center">
           <Input
             type="text"
@@ -132,7 +132,7 @@ const AboutDoctors: React.FC = () => {
           </Select>
         </div>
         {loading ? (
-          <div className="text-center text-blue-600 py-10">Loading doctors...</div>
+          <div className="text-center text-primary py-10">Loading doctors...</div>
         ) : error ? (
           <div className="text-center text-red-600 py-10">{error}</div>
         ) : (
@@ -140,28 +140,28 @@ const AboutDoctors: React.FC = () => {
             {filteredDoctors.map((doc) => (
               <Card
                 key={doc.id}
-                className="rounded-2xl p-6 flex flex-col gap-4 items-center border-blue-100 hover:shadow-xl transition-shadow duration-200"
+                className="p-6 flex flex-col gap-4 items-center hover:border-primary/40 transition-colors duration-200"
               >
-                <Avatar className="w-28 h-28 border-4 border-blue-200 shadow">
+                <Avatar className="w-24 h-24 border-2 border-border">
                   <AvatarImage
                     src={defaultDoctorImage}
                     alt={doc.fullName}
                     onError={e => (e.currentTarget.src = defaultDoctorImage)}
                   />
-                  <AvatarFallback className="text-2xl bg-blue-100 text-blue-600">
+                  <AvatarFallback className="text-2xl bg-muted text-primary">
                     {doc.fullName.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
-                <div className="font-bold text-xl text-blue-800 text-center">{doc.fullName}</div>
-                <div className="text-blue-500 font-medium text-center">{getSpecializationName(doc.specializationId)}</div>
+                <div className="font-semibold text-lg text-foreground text-center">{doc.fullName}</div>
+                <div className="text-primary font-medium text-center">{getSpecializationName(doc.specializationId)}</div>
                 <div className="flex flex-col gap-1 w-full mt-2">
-                  <div className="flex justify-between text-gray-600 text-sm">
+                  <div className="flex justify-between text-muted-foreground text-sm">
                     <span className="font-semibold">SLMC No:</span>
                     <span>{doc.slmcNumber}</span>
                   </div>
                 </div>
                 {doc.description && (
-                  <div className="text-gray-500 text-sm text-center mt-2">{doc.description}</div>
+                  <div className="text-muted-foreground text-sm text-center mt-2">{doc.description}</div>
                 )}
               </Card>
             ))}

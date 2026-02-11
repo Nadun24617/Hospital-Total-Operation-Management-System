@@ -64,9 +64,9 @@ export default function Signup({ onSuccess, onCancel }: SignupProps) {
       <div className="absolute inset-0 bg-black/50" />
       <form
         onSubmit={handleSubmit}
-        className="relative z-10 w-full max-w-2xl rounded-2xl border border-white/30 bg-white/10 p-10 text-white shadow-2xl backdrop-blur-xl"
+        className="relative z-10 w-full max-w-2xl rounded-lg border border-white/20 bg-white/10 p-10 text-white shadow-lg backdrop-blur-xl"
       >
-        <h2 className="text-3xl font-bold mb-6 text-center">Create an Account</h2>
+        <h2 className="text-2xl font-semibold mb-6 text-center">Create an Account</h2>
         {error && (
           <Alert variant="destructive" className="mb-4 bg-red-500/20 border-red-400/30">
             <AlertDescription className="text-red-200 text-sm">{error}</AlertDescription>
@@ -151,7 +151,7 @@ export default function Signup({ onSuccess, onCancel }: SignupProps) {
             required
           />
         </div>
-        <Button type="submit" className="w-full mb-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold">
+        <Button type="submit" className="w-full mb-3 bg-primary hover:bg-primary/90 text-white font-medium">
           Sign Up
         </Button>
         {onCancel && (

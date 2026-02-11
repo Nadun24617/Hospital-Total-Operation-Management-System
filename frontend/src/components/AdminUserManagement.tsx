@@ -206,7 +206,7 @@ export default function AdminUserManagement() {
       <section>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">All Users</h2>
-          <Button variant="link" size="sm" className="text-primary-700" onClick={() => void fetchUsers()}>
+          <Button variant="link" size="sm" className="text-primary" onClick={() => void fetchUsers()}>
             Refresh
           </Button>
         </div>
@@ -275,7 +275,7 @@ export default function AdminUserManagement() {
                           <Button
                             variant="link"
                             size="sm"
-                            className="text-primary-700"
+                            className="text-primary"
                             disabled={!roleChanged}
                             onClick={() => void updateRole(user.id)}
                           >
