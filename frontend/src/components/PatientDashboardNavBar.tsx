@@ -61,40 +61,34 @@ const PatientDashboardNavBar: React.FC<PatientDashboardNavBarProps> = ({ navLink
   };
 
   return (
-    <nav className="w-full bg-white shadow px-6 py-4 flex items-center rounded-b-2xl">
-      <div className="text-2xl font-bold text-blue-700 select-none">ABC Hospital</div>
+    <nav className="w-full bg-white border-b border-border px-6 py-3 flex items-center">
+      <div className="text-xl font-semibold text-foreground select-none">ABC Hospital</div>
       <div className="flex-1 flex items-center justify-center gap-2 md:gap-6">
         <Button
           variant={activeSection === 'home' ? 'secondary' : 'ghost'}
-          className={`relative min-h-[44px] px-4 text-lg font-medium ${
+          className={`min-h-[44px] px-4 text-lg font-medium ${
             activeSection === 'home'
-              ? 'text-blue-700 bg-blue-50 shadow font-semibold hover:bg-blue-50'
-              : 'text-gray-800 hover:bg-blue-50'
+              ? 'text-primary bg-accent font-semibold hover:bg-accent'
+              : 'text-muted-foreground hover:bg-accent'
           }`}
           onClick={() => handleNavClick('home')}
           aria-current={activeSection === 'home' ? 'page' : undefined}
         >
           Home
-          {activeSection === 'home' && (
-            <span className="absolute left-2 right-2 -bottom-1 h-2 rounded-b bg-blue-100 z-0" />
-          )}
         </Button>
         {navLinks.map((link) => (
           <Button
             key={link.id}
             variant={activeSection === link.id ? 'secondary' : 'ghost'}
-            className={`relative min-h-[44px] px-4 text-lg font-medium ${
+            className={`min-h-[44px] px-4 text-lg font-medium ${
               activeSection === link.id
-                ? 'text-blue-700 bg-blue-50 shadow font-semibold hover:bg-blue-50'
-                : 'text-gray-800 hover:bg-blue-50'
+                ? 'text-primary bg-accent font-semibold hover:bg-accent'
+                : 'text-muted-foreground hover:bg-accent'
             }`}
             onClick={() => handleNavClick(link.id)}
             aria-current={activeSection === link.id ? 'page' : undefined}
           >
             {link.label}
-            {activeSection === link.id && (
-              <span className="absolute left-2 right-2 -bottom-1 h-2 rounded-b bg-blue-100 z-0" />
-            )}
           </Button>
         ))}
       </div>
@@ -102,7 +96,7 @@ const PatientDashboardNavBar: React.FC<PatientDashboardNavBarProps> = ({ navLink
         {!isLoggedIn && (
           <Button
             variant="outline"
-            className="rounded-full border-blue-200 text-blue-500 hover:bg-blue-50 font-semibold"
+            className="border-border text-primary hover:bg-accent font-medium"
             onClick={() => (window.location.href = '/login')}
           >
             Login
@@ -119,12 +113,12 @@ const PatientDashboardNavBar: React.FC<PatientDashboardNavBarProps> = ({ navLink
             />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0 border-2 border-blue-300">
+                <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0 border border-border">
                   <Avatar className="h-10 w-10">
                     {profilePhoto ? (
                       <AvatarImage src={profilePhoto} alt="Profile" />
                     ) : null}
-                    <AvatarFallback className="bg-blue-50 text-blue-400">
+                    <AvatarFallback className="bg-muted text-muted-foreground">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="w-6 h-6"
@@ -145,30 +139,30 @@ const PatientDashboardNavBar: React.FC<PatientDashboardNavBarProps> = ({ navLink
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-64" align="end" sideOffset={8}>
                 <div className="flex flex-col items-center gap-2 p-4">
-                  <Avatar className="h-16 w-16 border-2 border-blue-300">
+                  <Avatar className="h-16 w-16 border border-border">
                     {profilePhoto ? (
                       <AvatarImage src={profilePhoto} alt="Profile" />
                     ) : null}
-                    <AvatarFallback className="bg-blue-100 text-blue-400">
+                    <AvatarFallback className="bg-muted text-muted-foreground">
                       <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                       </svg>
                     </AvatarFallback>
                   </Avatar>
-                  <DropdownMenuLabel className="text-lg text-blue-700">
+                  <DropdownMenuLabel className="text-lg text-foreground">
                     {user?.firstName || 'User'}
                   </DropdownMenuLabel>
-                  <span className="text-gray-500 text-sm">{user?.email || ''}</span>
+                  <span className="text-muted-foreground text-sm">{user?.email || ''}</span>
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  className="cursor-pointer justify-center text-blue-700 font-medium focus:bg-blue-50 focus:text-blue-700"
+                  className="cursor-pointer justify-center text-foreground font-medium"
                   onClick={() => alert('Edit profile (implement as needed)')}
                 >
                   Edit Profile
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className="cursor-pointer justify-center text-red-600 font-medium focus:bg-red-50 focus:text-red-600"
+                  className="cursor-pointer justify-center text-destructive font-medium"
                   onClick={() => logout()}
                 >
                   Logout

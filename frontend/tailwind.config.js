@@ -14,18 +14,10 @@ export default {
   	extend: {
   		colors: {
   			primary: {
-  				'50': '#f0f9ff',
-  				'500': '#0ea5e9',
-  				'600': '#0284c7',
-  				'700': '#0369a1',
-  				'900': '#0c2d6b',
   				DEFAULT: 'hsl(var(--primary))',
   				foreground: 'hsl(var(--primary-foreground))'
   			},
   			secondary: {
-  				'500': '#8b5cf6',
-  				'600': '#7c3aed',
-  				'700': '#6d28d9',
   				DEFAULT: 'hsl(var(--secondary))',
   				foreground: 'hsl(var(--secondary-foreground))'
   			},

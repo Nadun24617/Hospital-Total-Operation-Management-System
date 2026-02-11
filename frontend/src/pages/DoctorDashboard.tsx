@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { LayoutDashboard, Clock, Users, CalendarDays, History, User, ChevronLeft, ChevronRight, LogOut } from 'lucide-react';
 
 interface StatCardProps {
   label: string;
@@ -23,15 +24,15 @@ interface StatCardProps {
 
 function StatCard({ label, value, accent = 'primary' }: StatCardProps) {
   const accentClasses: Record<string, string> = {
-    primary: 'border-primary-100 bg-primary-50/40 text-primary-800',
-    green: 'border-emerald-100 bg-emerald-50/50 text-emerald-800',
-    amber: 'border-amber-100 bg-amber-50/60 text-amber-800',
-    red: 'border-rose-100 bg-rose-50/60 text-rose-800',
+    primary: 'border-sky-200 bg-sky-50 text-sky-900',
+    green: 'border-emerald-200 bg-emerald-50 text-emerald-900',
+    amber: 'border-amber-200 bg-amber-50 text-amber-900',
+    red: 'border-rose-200 bg-rose-50 text-rose-900',
   };
 
   return (
-    <Card className={`rounded-2xl hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 px-4 py-3 sm:px-5 sm:py-4 ${accentClasses[accent]}`}>
-      <span className="text-xs sm:text-[0.8rem] font-medium tracking-wide text-gray-600/80 uppercase">{label}</span>
+    <Card className={`transition-colors px-4 py-3 sm:px-5 sm:py-4 ${accentClasses[accent]}`}>
+      <span className="text-xs sm:text-[0.8rem] font-medium tracking-wide text-muted-foreground uppercase">{label}</span>
       <span className="mt-1 text-xl sm:text-2xl font-semibold leading-tight block">{value}</span>
     </Card>
   );
@@ -68,24 +69,12 @@ export default function DoctorDashboard() {
   ];
 
   const navItems = [
-    { id: 'dashboard' as const, label: 'Dashboard', icon: (
-      <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary-50 text-primary-700 text-lg font-semibold">D</span>
-    ) },
-    { id: 'appointments' as const, label: 'Appointments', icon: (
-      <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 text-lg font-semibold">A</span>
-    ) },
-    { id: 'patients' as const, label: 'Patient List', icon: (
-      <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 text-lg font-semibold">P</span>
-    ) },
-    { id: 'schedule' as const, label: 'Schedule / Availability', icon: (
-      <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-violet-50 text-violet-600 text-lg font-semibold">S</span>
-    ) },
-    { id: 'history' as const, label: 'Consultation History', icon: (
-      <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-sky-50 text-sky-600 text-lg font-semibold">H</span>
-    ) },
-    { id: 'profile' as const, label: 'Profile', icon: (
-      <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 text-amber-600 text-lg font-semibold">Pr</span>
-    ) },
+    { id: 'dashboard' as const, label: 'Dashboard', icon: <LayoutDashboard className="h-5 w-5" /> },
+    { id: 'appointments' as const, label: 'Appointments', icon: <Clock className="h-5 w-5" /> },
+    { id: 'patients' as const, label: 'Patient List', icon: <Users className="h-5 w-5" /> },
+    { id: 'schedule' as const, label: 'Schedule / Availability', icon: <CalendarDays className="h-5 w-5" /> },
+    { id: 'history' as const, label: 'Consultation History', icon: <History className="h-5 w-5" /> },
+    { id: 'profile' as const, label: 'Profile', icon: <User className="h-5 w-5" /> },
   ];
 
   const handleLogout = () => {
@@ -94,16 +83,16 @@ export default function DoctorDashboard() {
   };
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-blue-50 via-slate-50 to-emerald-50 text-slate-900">
+    <div className="min-h-screen flex bg-muted text-slate-900">
       {/* Side navigation */}
       <aside
-        className={`relative flex flex-col bg-white/90 backdrop-blur border-r border-slate-200 shadow-sm transition-all duration-300 ease-out ${
+        className={`relative flex flex-col bg-white border-r border-border transition-all duration-300 ease-out ${
           collapsed ? 'w-18 md:w-20' : 'w-64'
         }`}
       >
-        <div className="flex items-center justify-between px-4 py-4 border-b border-slate-100">
+        <div className="flex items-center justify-between px-4 py-4 border-b border-border">
           <div className="flex items-center gap-2 overflow-hidden">
-            <div className="h-9 w-9 rounded-2xl bg-primary-600 text-white flex items-center justify-center text-xl font-bold shadow-sm">
+            <div className="h-9 w-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center text-xl font-bold">
               D
             </div>
             {!collapsed && (
@@ -116,11 +105,11 @@ export default function DoctorDashboard() {
           <Button
             variant="outline"
             size="sm"
-            className="ml-2 h-8 w-8 rounded-full p-0"
+            className="ml-2 h-8 w-8 p-0"
             onClick={() => setCollapsed(prev => !prev)}
             aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}
           >
-            <span className="text-xs">{collapsed ? '»' : '«'}</span>
+            {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </Button>
         </div>
 
@@ -131,10 +120,10 @@ export default function DoctorDashboard() {
               <Button
                 key={item.id}
                 variant={isActive ? 'secondary' : 'ghost'}
-                className={`w-full justify-start gap-3 rounded-xl px-3 py-2.5 text-sm font-medium ${
+                className={`w-full justify-start gap-3 px-3 py-2.5 text-sm font-medium ${
                   isActive
-                    ? 'bg-primary-50 text-primary-800 shadow-sm hover:bg-primary-50'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    ? 'bg-accent text-foreground hover:bg-accent'
+                    : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                 }`}
                 onClick={() => setActiveSection(item.id)}
               >
@@ -149,10 +138,10 @@ export default function DoctorDashboard() {
         <div className="px-3 py-4">
           <Button
             variant="destructive"
-            className="w-full rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 hover:text-rose-700"
+            className="w-full bg-red-50 text-destructive hover:bg-red-100"
             onClick={handleLogout}
           >
-            <span className="text-base mr-2">⎋</span>
+            <LogOut className="h-4 w-4 mr-2" />
             {!collapsed && <span>Logout</span>}
           </Button>
         </div>
@@ -161,7 +150,7 @@ export default function DoctorDashboard() {
       {/* Main content */}
       <main className="flex-1 flex flex-col">
         {/* Top bar */}
-        <header className="flex items-center justify-between px-6 py-4 border-b border-slate-200/80 bg-white/80 backdrop-blur sticky top-0 z-10">
+        <header className="flex items-center justify-between px-6 py-4 border-b border-border bg-white sticky top-0 z-10">
           <div>
             <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">
               {activeSection === 'dashboard' && 'Today\'s Overview'}
@@ -181,7 +170,7 @@ export default function DoctorDashboard() {
               <span className="uppercase tracking-wide text-[0.65rem]">{user?.role ?? 'DOCTOR'}</span>
             </div>
             <Avatar className="h-9 w-9">
-              <AvatarFallback className="bg-primary-600 text-white text-sm font-semibold">
+              <AvatarFallback className="bg-primary text-primary-foreground text-sm font-semibold">
                 {user?.firstName?.[0] ?? 'D'}
               </AvatarFallback>
             </Avatar>
@@ -206,13 +195,13 @@ export default function DoctorDashboard() {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
                 {/* Left: Queue & next patient */}
                 <div className="lg:col-span-5 xl:col-span-4 space-y-4">
-                  <Card className="rounded-2xl hover:shadow-md transition-shadow duration-200">
+                  <Card>
                     <CardContent className="p-4 sm:p-5 flex flex-col gap-3">
                       <div className="flex items-center justify-between">
                         <h2 className="text-sm sm:text-base font-semibold text-slate-900">Next Patient</h2>
-                        <Badge variant="secondary" className="bg-primary-50 text-primary-700 hover:bg-primary-50">Up next</Badge>
+                        <Badge variant="secondary" className="bg-sky-50 text-sky-700 hover:bg-sky-50">Up next</Badge>
                       </div>
-                      <div className="rounded-xl border border-slate-100 bg-slate-50/60 px-3 py-3 flex flex-col gap-1">
+                      <div className="rounded-md border border-border bg-muted px-3 py-3 flex flex-col gap-1">
                         <div className="flex items-center justify-between text-sm">
                           <span className="font-semibold text-slate-900">{todaySummary.nextPatient}</span>
                           <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 hover:bg-emerald-50">In Clinic</Badge>
@@ -229,18 +218,18 @@ export default function DoctorDashboard() {
                     </CardContent>
                   </Card>
 
-                  <Card className="rounded-2xl hover:shadow-md transition-shadow duration-200">
+                  <Card>
                     <CardContent className="p-4 sm:p-5">
                       <div className="flex items-center justify-between mb-3">
                         <h2 className="text-sm sm:text-base font-semibold text-slate-900">Live Queue</h2>
                         <span className="text-[0.7rem] text-slate-500 uppercase tracking-wide">Updated in real time</span>
                       </div>
                       <div className="space-y-2 text-xs sm:text-sm">
-                        <div className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
+                        <div className="flex items-center justify-between rounded-md bg-muted px-3 py-2">
                           <span className="font-medium text-slate-800">Token {todaySummary.liveNumber}</span>
                           <span className="text-emerald-600 font-semibold">Now Serving</span>
                         </div>
-                        <div className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
+                        <div className="flex items-center justify-between rounded-md bg-muted px-3 py-2">
                           <span className="text-slate-700">Next: A-18, A-19</span>
                           <span className="text-slate-500">Approx 10 min</span>
                         </div>
@@ -250,14 +239,14 @@ export default function DoctorDashboard() {
                 </div>
 
                 {/* Middle: Today's appointments */}
-                <Card className="lg:col-span-7 xl:col-span-5 rounded-2xl hover:shadow-md transition-shadow duration-200">
+                <Card className="lg:col-span-7 xl:col-span-5">
                   <CardContent className="p-4 sm:p-5 flex flex-col">
                     <div className="flex items-center justify-between mb-3">
                       <div>
                         <h2 className="text-sm sm:text-base font-semibold text-slate-900">Today's Appointments</h2>
                         <p className="text-xs text-slate-500">Overview of upcoming patients for today.</p>
                       </div>
-                      <Button variant="outline" size="sm" className="rounded-full text-xs">
+                      <Button variant="outline" size="sm" className="text-xs">
                         View all
                       </Button>
                     </div>
@@ -282,7 +271,7 @@ export default function DoctorDashboard() {
                                   variant="secondary"
                                   className={
                                     row.status === 'Next'
-                                      ? 'bg-primary-50 text-primary-700 hover:bg-primary-50'
+                                      ? 'bg-sky-50 text-sky-700 hover:bg-sky-50'
                                       : 'bg-amber-50 text-amber-700 hover:bg-amber-50'
                                   }
                                 >
@@ -299,7 +288,7 @@ export default function DoctorDashboard() {
 
                 {/* Right: Notifications & activity */}
                 <div className="lg:col-span-12 xl:col-span-3 space-y-4">
-                  <Card className="rounded-2xl hover:shadow-md transition-shadow duration-200">
+                  <Card>
                     <CardContent className="p-4 sm:p-5">
                       <div className="flex items-center justify-between mb-3">
                         <h2 className="text-sm sm:text-base font-semibold text-slate-900">Notifications</h2>
@@ -309,7 +298,7 @@ export default function DoctorDashboard() {
                         {notifications.map((note, idx) => (
                           <li
                             key={idx}
-                            className="rounded-xl border border-slate-100 bg-slate-50/60 px-3 py-2 hover:border-primary-100 hover:bg-primary-50/40 transition-colors"
+                            className="rounded-md border border-border bg-muted px-3 py-2 hover:border-primary/40 hover:bg-accent transition-colors"
                           >
                             <div className="flex items-center justify-between">
                               <span className="text-[0.7rem] font-semibold uppercase tracking-wide text-slate-500">{note.type}</span>
@@ -322,11 +311,11 @@ export default function DoctorDashboard() {
                     </CardContent>
                   </Card>
 
-                  <Card className="rounded-2xl bg-gradient-to-r from-primary-600 to-primary-500 text-white shadow-md border-0">
+                  <Card className="bg-primary text-primary-foreground border-0">
                     <CardContent className="px-4 py-4 sm:px-5 sm:py-4 flex flex-col gap-2">
-                      <div className="text-xs font-semibold uppercase tracking-[0.15em] text-white/75">Focus Mode</div>
+                      <div className="text-xs font-semibold uppercase tracking-[0.15em] text-primary-foreground/75">Focus Mode</div>
                       <div className="text-sm sm:text-base font-semibold">Keep your consultations distraction-free.</div>
-                      <p className="text-xs text-primary-50/90">
+                      <p className="text-xs text-primary-foreground/80">
                         Notifications are summarised here while you focus on one patient at a time.
                       </p>
                     </CardContent>
@@ -337,7 +326,7 @@ export default function DoctorDashboard() {
           )}
 
           {activeSection !== 'dashboard' && (
-            <Card className="rounded-2xl">
+            <Card>
               <CardContent className="p-6 text-sm text-slate-500 flex items-center justify-center">
                 <p>
                   The <span className="font-semibold text-slate-700">{navItems.find(n => n.id === activeSection)?.label}</span> section layout is ready.
