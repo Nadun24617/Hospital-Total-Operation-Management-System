@@ -33,4 +33,22 @@ model User {
   isConfirmed  Boolean    @default(false)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
+  doctor       Doctor?
+}
+
+model Doctor {
+  id               Int       @id @default(autoincrement()) @map("doctor_id")
+  userId           String    @unique @db.VarChar(36) @map("user_id")
+  fullName         String    @db.VarChar(150) @map("full_name")
+  slmcNumber       String    @unique @db.VarChar(50) @map("slmc_number")
+  specializationId Int       @map("specialization_id")
+  phone            String?   @db.VarChar(20)
+  email            String?   @db.VarChar(100)
+  description      String?   @db.Text
+  joinedDate       DateTime? @db.Date @map("joined_date")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
 }

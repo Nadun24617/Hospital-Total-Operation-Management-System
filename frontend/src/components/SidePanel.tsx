@@ -1,6 +1,7 @@
 
 
 import { useAuth } from '../auth';
+import { useNavigate } from 'react-router-dom';
 
 interface SidePanelProps {
   items: { label: string; icon?: React.ReactNode; onClick?: () => void }[];
@@ -9,6 +10,12 @@ interface SidePanelProps {
 
 export default function SidePanel({ items, activeIndex = 0 }: SidePanelProps) {
   const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/'); // Redirect to landing page
+  };
   return (
     <aside className="h-screen w-64 bg-white border-r border-gray-200 flex flex-col shadow-sm">
       <div className="p-6 text-2xl font-bold text-primary-700 border-b border-gray-100">Dashboard</div>
@@ -29,7 +36,7 @@ export default function SidePanel({ items, activeIndex = 0 }: SidePanelProps) {
       <div className="p-4 border-t border-gray-100 mt-auto">
         <button
           className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-red-600 font-semibold bg-red-50 hover:bg-red-100 transition-colors"
-          onClick={logout}
+          onClick={handleLogout}
         >
           Logout
         </button>

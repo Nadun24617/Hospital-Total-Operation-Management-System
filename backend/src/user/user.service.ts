@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import argon2 from 'argon2';
 
 import { PrismaService } from '../prisma/prisma.service';
@@ -35,13 +35,13 @@ export class UserService {
   }
 
   async createStaff(dto: CreateStaffDto): Promise<User> {
-    const { email, phone, password, role, ...rest } = dto;
+    const { email, phone, password, role, slmcNumber, specializationId, description, joinedDate, ...rest } = dto;
 
     await this.ensureUniqueContact(email, phone);
 
     const passwordHash = await argon2.hash(password);
 
-    return this.prisma.user.create({
+    const user = await this.prisma.user.create({
       data: {
         ...rest,
         email,
@@ -52,6 +52,27 @@ export class UserService {
         isConfirmed: true
       }
     });
+
+    if (role === UserRole.DOCTOR) {
+      if (!slmcNumber || specializationId == null) {
+        throw new BadRequestException('slmcNumber and specializationId are required for doctor staff accounts');
+      }
+
+      await this.prisma.doctor.create({
+        data: {
+          userId: user.id,
+          fullName: `${user.firstName} ${user.lastName}`,
+          slmcNumber,
+          specializationId,
+          phone: user.phone,
+          email: user.email,
+          description: description ?? undefined,
+          joinedDate: joinedDate ? new Date(joinedDate) : undefined
+        }
+      });
+    }
+
+    return user;
   }
 
   async getAllUsers(): Promise<User[]> {

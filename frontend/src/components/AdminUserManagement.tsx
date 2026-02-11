@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useAuth } from '../auth';
+import { SPECIALIZATIONS } from '../constants/specializations';
 
 type ManagedRole = 'ADMIN' | 'STAFF' | 'DOCTOR' | 'NURSE' | 'USER';
 
@@ -25,7 +26,12 @@ const initialStaffForm = {
   email: '',
   phone: '',
   password: '',
-  role: 'STAFF' as ManagedRole
+  role: 'STAFF' as ManagedRole,
+  // Doctor-specific fields (used when role === 'DOCTOR')
+  slmcNumber: '',
+  specializationId: 0,
+  description: '',
+  joinedDate: ''
 };
 
 export default function AdminUserManagement() {
@@ -133,10 +139,10 @@ export default function AdminUserManagement() {
     }
   };
 
-  const handleStaffFormChange = (field: keyof typeof staffForm, value: string) => {
+  const handleStaffFormChange = (field: keyof typeof staffForm, value: string | number) => {
     setStaffForm(prev => ({
       ...prev,
-      [field]: value
+      [field]: field === 'specializationId' ? Number(value) || 0 : value
     }));
   };
 
@@ -367,6 +373,66 @@ export default function AdminUserManagement() {
               ))}
             </select>
           </div>
+          {staffForm.role === 'DOCTOR' && (
+            <>
+              <div>
+                <label className="block text-sm font-medium mb-1" htmlFor="staff-slmc-number">
+                  SLMC Number
+                </label>
+                <input
+                  id="staff-slmc-number"
+                  type="text"
+                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  value={staffForm.slmcNumber}
+                  onChange={event => handleStaffFormChange('slmcNumber', event.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1" htmlFor="staff-specialization-id">
+                  Specialization
+                </label>
+                <select
+                  id="staff-specialization-id"
+                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  value={staffForm.specializationId}
+                  onChange={event => handleStaffFormChange('specializationId', Number(event.target.value))}
+                  required
+                >
+                  <option value={0}>Select specialization…</option>
+                  {SPECIALIZATIONS.map(spec => (
+                    <option key={spec.id} value={spec.id}>
+                      {spec.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1" htmlFor="staff-description">
+                  Doctor Description
+                </label>
+                <textarea
+                  id="staff-description"
+                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  value={staffForm.description}
+                  onChange={event => handleStaffFormChange('description', event.target.value)}
+                  rows={3}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1" htmlFor="staff-joined-date">
+                  Joined Date
+                </label>
+                <input
+                  id="staff-joined-date"
+                  type="date"
+                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  value={staffForm.joinedDate}
+                  onChange={event => handleStaffFormChange('joinedDate', event.target.value)}
+                />
+              </div>
+            </>
+          )}
           <div className="md:col-span-2 flex justify-end">
             <button
               type="submit"

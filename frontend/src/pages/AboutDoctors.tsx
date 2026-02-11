@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import PatientDashboardNavBar from '../components/PatientDashboardNavBar';
 import defaultDoctorImage from '../assets/doctors/image.png';
+import { SPECIALIZATIONS } from '../constants/specializations';
 import Footer from '../components/Footer';
 
 const navLinks = [
@@ -9,80 +10,27 @@ const navLinks = [
   { label: 'Doctors', id: 'doctors' },
 ];
 
-const doctorsData = [
-  {
-    name: 'Dr. Saman Perera',
-    specialization: 'Consultant Cardiologist',
-    description: 'Dr. Saman Perera has over 15 years of experience in diagnosing and treating heart-related conditions, including coronary artery disease, hypertension, and heart failure. He is committed to providing patient-focused cardiac care using modern medical practices.',
-    image: '/assets/doctors/doctor1.jpg',
-    category: 'Cardiology',
-  },
-  {
-    name: 'Dr. Nirosha Fernando',
-    specialization: 'Consultant Dermatologist',
-    description: 'Dr. Nirosha Fernando specializes in treating skin, hair, and nail disorders. She has extensive experience in managing acne, eczema, psoriasis, and hair loss using evidence-based dermatological treatments.',
-    image: '/assets/doctors/doctor2.jpg',
-    category: 'Dermatology',
-  },
-  {
-    name: 'Dr. Mahesh Jayawardena',
-    specialization: 'Consultant Orthopedic Surgeon',
-    description: 'Dr. Mahesh Jayawardena is an expert in bone, joint, and spine disorders. His clinical focus includes fracture management, joint replacement surgery, and sports injury treatment.',
-    image: '/assets/doctors/doctor3.jpg',
-    category: 'Orthopedics',
-  },
-  {
-    name: 'Dr. Tharindu Wijesinghe',
-    specialization: 'Consultant Pediatrician',
-    description: 'Dr. Tharindu Wijesinghe provides comprehensive healthcare for infants, children, and adolescents. He emphasizes preventive care, immunizations, and child growth and development monitoring.',
-    image: '/assets/doctors/doctor4.jpg',
-    category: 'Pediatrics',
-  },
-  {
-    name: 'Dr. Anusha Silva',
-    specialization: 'Consultant Gynecologist & Obstetrician',
-    description: 'Dr. Anusha Silva has significant experience in women’s health, maternity care, and high-risk pregnancy management. She is dedicated to ensuring safe and personalized care for mothers and newborns.',
-    image: '/assets/doctors/doctor5.jpg',
-    category: 'Gynecology',
-  },
-  {
-    name: 'Dr. Ruwan Abeysekera',
-    specialization: 'Consultant General Surgeon',
-    description: 'Dr. Ruwan Abeysekera specializes in general and laparoscopic surgical procedures. His areas of expertise include abdominal surgery, hernia repair, and minimally invasive surgical techniques.',
-    image: '/assets/doctors/doctor6.jpg',
-    category: 'Surgery',
-  },
-  {
-    name: 'Dr. Chamila Karunaratne',
-    specialization: 'Consultant Neurologist',
-    description: 'Dr. Chamila Karunaratne focuses on the diagnosis and management of neurological disorders such as epilepsy, stroke, migraine, and movement disorders, offering comprehensive neurological care.',
-    image: '/assets/doctors/doctor7.jpg',
-    category: 'Neurology',
-  },
-  {
-    name: 'Dr. Ishan De Silva',
-    specialization: 'Consultant Psychiatrist',
-    description: 'Dr. Ishan De Silva provides mental health care for patients with anxiety, depression, stress-related disorders, and mood disorders, using a compassionate and confidential approach.',
-    image: '/assets/doctors/doctor8.jpg',
-    category: 'Psychiatry',
-  },
-  {
-    name: 'Dr. Malithi Gunasekara',
-    specialization: 'Consultant Endocrinologist',
-    description: 'Dr. Malithi Gunasekara specializes in hormonal disorders, including diabetes, thyroid conditions, and metabolic diseases, focusing on long-term disease management and lifestyle guidance.',
-    image: '/assets/doctors/doctor9.jpg',
-    category: 'Endocrinology',
-  },
-  {
-    name: 'Dr. Kasun Rathnayake',
-    specialization: 'Consultant General Physician',
-    description: 'Dr. Kasun Rathnayake offers comprehensive medical care for common and chronic illnesses, emphasizing accurate diagnosis, preventive healthcare, and patient education.',
-    image: '/assets/doctors/doctor10.jpg',
-    category: 'General Medicine',
-  },
-];
+// Fetch doctors from backend
 
-const categories = Array.from(new Set(doctorsData.map(d => d.category)));
+type Doctor = {
+  id: number;
+  userId: string;
+  fullName: string;
+  slmcNumber: string;
+  specializationId: number;
+  phone?: string;
+  email?: string;
+  description?: string;
+  joinedDate?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  // Optionally add category, specialization, image if backend provides
+};
+
+const getSpecializationName = (id: number) => {
+  const spec = SPECIALIZATIONS.find(s => s.id === id);
+  return spec ? spec.name : 'Other';
+};
 
 const sortOptions = [
   { value: 'name', label: 'Name' },
@@ -90,19 +38,49 @@ const sortOptions = [
   { value: 'category', label: 'Category' },
 ];
 
+
 const AboutDoctors: React.FC = () => {
   const [search, setSearch] = useState('');
-  const [sortBy, setSortBy] = useState('name');
+  const [sortBy, setSortBy] = useState('fullName');
   const [category, setCategory] = useState('All');
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch('/api/doctors', {
+          credentials: 'include',
+        });
+        if (!res.ok) throw new Error('Failed to fetch doctors');
+        const data = await res.json();
+        setDoctors(data);
+      } catch (err: any) {
+        setError(err.message || 'Error fetching doctors');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDoctors();
+  }, []);
+
+  // Derive categories from fetched data
+  const categories = useMemo(() => {
+    const setCat = new Set(doctors.map(d => getSpecializationName(d.specializationId)));
+    return Array.from(setCat);
+  }, [doctors]);
 
   const filteredDoctors = useMemo(() => {
-    let docs = doctorsData.filter(d =>
-      d.name.toLowerCase().includes(search.toLowerCase()) ||
-      d.specialization.toLowerCase().includes(search.toLowerCase()) ||
-      d.category.toLowerCase().includes(search.toLowerCase())
+    let docs = doctors.filter(d =>
+      d.fullName.toLowerCase().includes(search.toLowerCase()) ||
+      d.slmcNumber?.toLowerCase().includes(search.toLowerCase()) ||
+      getSpecializationName(d.specializationId).toLowerCase().includes(search.toLowerCase())
     );
     if (category !== 'All') {
-      docs = docs.filter(d => d.category === category);
+      docs = docs.filter(d => getSpecializationName(d.specializationId) === category);
     }
     docs = docs.sort((a, b) => {
       const aVal = (a as Record<string, string>)[sortBy] || '';
@@ -110,7 +88,7 @@ const AboutDoctors: React.FC = () => {
       return aVal.localeCompare(bVal);
     });
     return docs;
-  }, [search, sortBy, category]);
+  }, [search, sortBy, category, doctors]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
@@ -150,22 +128,38 @@ const AboutDoctors: React.FC = () => {
           </select>
         </div>
         {/* Doctor Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredDoctors.map((doc,) => (
-            <div key={doc.name} className="bg-white rounded-2xl shadow p-6 flex flex-col gap-3 items-center">
-              <img
-                src={doc.image && doc.image.trim() ? doc.image : defaultDoctorImage}
-                alt={doc.name}
-                className="w-28 h-28 rounded-full object-cover border-4 border-blue-100 mb-2"
-                onError={e => (e.currentTarget.src = defaultDoctorImage)}
-              />
-              <div className="font-bold text-lg text-blue-700 text-center">{doc.name}</div>
-              <div className="text-blue-500 font-medium text-center">{doc.specialization}</div>
-              <div className="text-gray-600 text-sm text-center mb-2">{doc.category}</div>
-              <div className="text-gray-500 text-sm text-center">{doc.description}</div>
-            </div>
-          ))}
-        </div>
+        {loading ? (
+          <div className="text-center text-blue-600 py-10">Loading doctors...</div>
+        ) : error ? (
+          <div className="text-center text-red-600 py-10">{error}</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredDoctors.map((doc) => (
+              <div
+                key={doc.id}
+                className="bg-white rounded-2xl shadow-lg p-6 flex flex-col gap-4 items-center border border-blue-100 hover:shadow-xl transition-shadow duration-200"
+              >
+                <img
+                  src={defaultDoctorImage}
+                  alt={doc.fullName}
+                  className="w-28 h-28 rounded-full object-cover border-4 border-blue-200 mb-2 shadow"
+                  onError={e => (e.currentTarget.src = defaultDoctorImage)}
+                />
+                <div className="font-bold text-xl text-blue-800 text-center">{doc.fullName}</div>
+                <div className="text-blue-500 font-medium text-center">{getSpecializationName(doc.specializationId)}</div>
+                <div className="flex flex-col gap-1 w-full mt-2">
+                  <div className="flex justify-between text-gray-600 text-sm">
+                    <span className="font-semibold">SLMC No:</span>
+                    <span>{doc.slmcNumber}</span>
+                  </div>
+                </div>
+                {doc.description && (
+                  <div className="text-gray-500 text-sm text-center mt-2">{doc.description}</div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       <Footer />
     </div>
