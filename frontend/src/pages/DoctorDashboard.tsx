@@ -94,7 +94,7 @@ export default function DoctorDashboard() {
   };
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-blue-50 via-slate-50 to-emerald-50 text-slate-900">
+    <div className="min-h-screen flex bg-muted text-slate-900">
       {/* Side navigation */}
       <aside
         className={`relative flex flex-col bg-white/90 backdrop-blur border-r border-slate-200 shadow-sm transition-all duration-300 ease-out ${

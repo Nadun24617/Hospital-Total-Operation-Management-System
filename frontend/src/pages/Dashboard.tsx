@@ -38,7 +38,7 @@ export default function Dashboard() {
   const activeFeature = features[active] ?? features[0];
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-muted">
       <SidePanel
         items={features.map((f, idx) => ({
           ...f,
