@@ -132,11 +132,9 @@ const AppointmentBooking: React.FC = () => {
 
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-muted">
-        <div className="relative">
-          <PatientDashboardNavBar navLinks={navLinks} />
-        </div>
-        <main className="max-w-3xl mx-auto mt-12 px-4">
+      <div className="min-h-screen flex flex-col bg-muted">
+        <PatientDashboardNavBar navLinks={navLinks} />
+        <main className="flex-1 max-w-3xl mx-auto mt-12 px-4">
           <Card className="p-8 flex flex-col items-center text-center gap-4">
             <h1 className="text-2xl font-bold text-foreground">Appointment Booking</h1>
             <p className="text-muted-foreground">
@@ -553,11 +551,9 @@ const AppointmentBooking: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-muted">
-      <div className="relative">
-        <PatientDashboardNavBar navLinks={navLinks} />
-      </div>
-      <main className="max-w-6xl mx-auto mt-8 px-4 pb-10 space-y-8">
+    <div className="min-h-screen flex flex-col bg-muted">
+      <PatientDashboardNavBar navLinks={navLinks} />
+      <main className="flex-1 max-w-6xl mx-auto mt-8 px-4 pb-10 space-y-8">
         {step === 'selectDoctor' && renderDoctorSelection()}
         {step === 'dateTime' && renderDateTimeSelection()}
         {step === 'detailsForm' && renderDetailsForm()}

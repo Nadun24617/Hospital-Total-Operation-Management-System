@@ -26,11 +26,9 @@ const AboutHospital: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-muted">
-      <div className="relative">
-        <PatientDashboardNavBar navLinks={navLinks} />
-      </div>
-      <div className="max-w-5xl mx-auto py-10 px-4 space-y-10">
+    <div className="min-h-screen flex flex-col bg-muted">
+      <PatientDashboardNavBar navLinks={navLinks} />
+      <div className="flex-1 max-w-5xl mx-auto py-10 px-4 space-y-10">
         {/* Hero Section */}
         <div className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden border border-border">
           {heroImages.map((img, idx) => (

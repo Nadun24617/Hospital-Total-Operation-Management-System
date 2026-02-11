@@ -24,12 +24,10 @@ const PatientDashboard: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-muted">
-      <div className="relative">
-        <PatientDashboardNavBar navLinks={navLinks} />
-      </div>
+    <div className="min-h-screen flex flex-col bg-muted">
+      <PatientDashboardNavBar navLinks={navLinks} />
 
-      <main className="max-w-6xl mx-auto mt-8 p-4 space-y-12">
+      <main className="flex-1 max-w-6xl mx-auto mt-8 p-4 space-y-12">
         <Card className="p-8 md:p-10 flex flex-col md:flex-row items-center gap-8">
           <div className="flex-1">
             <p className="text-xs uppercase tracking-widest text-primary mb-2">Welcome to ABC Hospital</p>
