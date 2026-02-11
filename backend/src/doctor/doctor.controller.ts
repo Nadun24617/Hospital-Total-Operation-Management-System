@@ -17,6 +17,12 @@ export class DoctorController {
     return this.doctorService.findAll();
   }
 
+  // Public endpoint for confirmed doctors only (used by booking flow)
+  @Get('confirmed')
+  async listConfirmedDoctors() {
+    return this.doctorService.findConfirmed();
+  }
+
 
   // Protected endpoints below
   @UseGuards(AuthGuard('jwt'), RolesGuard)

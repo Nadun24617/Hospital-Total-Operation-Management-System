@@ -15,6 +15,19 @@ export class DoctorService {
     });
   }
 
+  async findConfirmed() {
+    await this.ensureDoctorsForDoctorUsers();
+    return this.prisma.doctor.findMany({
+      where: {
+        user: {
+          role: UserRole.DOCTOR,
+          isConfirmed: true
+        }
+      },
+      orderBy: { fullName: 'asc' }
+    });
+  }
+
   async findOne(id: number) {
     const doctor = await this.prisma.doctor.findUnique({ where: { id } });
     if (!doctor) {

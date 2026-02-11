@@ -1,8 +1,10 @@
 import React, { useMemo, useState, useEffect } from 'react';
+import axios from 'axios';
 import PatientDashboardNavBar from '../components/PatientDashboardNavBar';
 import Footer from '../components/Footer';
 import { useAuth } from '../auth';
 import { useNavigate } from 'react-router-dom';
+import { SPECIALIZATIONS } from '../constants/specializations';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -24,48 +26,20 @@ const navLinks = [
   { label: 'Doctors', id: 'doctors' },
 ];
 
-interface Doctor {
-  id: string;
-  name: string;
-  specialization: string;
-  department: string;
-  description: string;
-  hospital: string;
-  availableSlots: string[];
+interface ApiDoctor {
+  id: number;
+  userId: string;
+  fullName: string;
+  slmcNumber: string;
+  specializationId: number;
+  phone?: string | null;
+  email?: string | null;
+  description?: string | null;
+  joinedDate?: string | null;
 }
 
-const doctors: Doctor[] = [
-  {
-    id: 'doc-1',
-    name: 'Dr. Saman Perera',
-    specialization: 'Consultant Cardiologist',
-    department: 'Cardiology',
-    description:
-      'Specialist in heart-related conditions including coronary artery disease, hypertension and heart failure.',
-    hospital: 'ABC Hospital - Cardiology Unit',
-    availableSlots: ['09:00', '09:30', '10:00', '11:00'],
-  },
-  {
-    id: 'doc-2',
-    name: 'Dr. Nirosha Fernando',
-    specialization: 'Consultant Dermatologist',
-    department: 'Dermatology',
-    description:
-      'Experienced in treating skin, hair and nail disorders with modern dermatological practices.',
-    hospital: 'ABC Hospital - Dermatology Centre',
-    availableSlots: ['10:00', '10:30', '11:00', '14:00'],
-  },
-  {
-    id: 'doc-3',
-    name: 'Dr. Tharindu Wijesinghe',
-    specialization: 'Consultant Pediatrician',
-    department: 'Pediatrics',
-    description:
-      'Provides comprehensive healthcare for infants, children and adolescents with a focus on preventive care.',
-    hospital: 'ABC Hospital - Children\'s Clinic',
-    availableSlots: ['13:00', '13:30', '14:00', '15:00'],
-  },
-];
+const DEFAULT_TIME_SLOTS = ['09:00', '09:30', '10:00', '10:30', '11:00', '14:00', '14:30', '15:00'];
+const DEFAULT_HOSPITAL_LABEL = 'ABC Hospital';
 
 export type AppointmentStatus = 'UPCOMING' | 'PAST' | 'CANCELLED';
 
@@ -93,11 +67,19 @@ type Step = 'selectDoctor' | 'dateTime' | 'detailsForm' | 'confirm' | 'success';
 const APPOINTMENTS_KEY = 'appointments';
 
 const AppointmentBooking: React.FC = () => {
-  const { isLoggedIn, user } = useAuth();
+  const { isLoggedIn, user, token } = useAuth();
   const navigate = useNavigate();
 
+  const authHeaders = useMemo(
+    () => (token ? { Authorization: `Bearer ${token}` } : undefined),
+    [token],
+  );
+
   const [step, setStep] = useState<Step>('selectDoctor');
-  const [selectedDoctorId, setSelectedDoctorId] = useState<string | null>(null);
+  const [doctors, setDoctors] = useState<ApiDoctor[]>([]);
+  const [doctorsLoading, setDoctorsLoading] = useState(false);
+  const [doctorsError, setDoctorsError] = useState('');
+  const [selectedDoctorId, setSelectedDoctorId] = useState<number | null>(null);
   const [date, setDate] = useState('');
   const [timeSlot, setTimeSlot] = useState('');
   const [patientName, setPatientName] = useState('');
@@ -108,8 +90,37 @@ const AppointmentBooking: React.FC = () => {
 
   const selectedDoctor = useMemo(
     () => doctors.find((d) => d.id === selectedDoctorId) || null,
-    [selectedDoctorId],
+    [doctors, selectedDoctorId],
   );
+
+  const specializationName = useMemo(() => {
+    const map = new Map(SPECIALIZATIONS.map((s) => [s.id, s.name] as const));
+    return (id: number) => map.get(id) || (id ? `#${id}` : 'Not specified');
+  }, []);
+
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    setDoctorsLoading(true);
+    setDoctorsError('');
+
+    void (async () => {
+      try {
+        const response = await axios.get<ApiDoctor[]>(
+          `${import.meta.env.VITE_API_URL}/doctors/confirmed`,
+          { headers: authHeaders },
+        );
+        setDoctors(response.data);
+      } catch (err) {
+        if (axios.isAxiosError(err)) {
+          setDoctorsError(err.response?.data?.message ?? 'Failed to load doctors.');
+        } else {
+          setDoctorsError('Failed to load doctors.');
+        }
+      } finally {
+        setDoctorsLoading(false);
+      }
+    })();
+  }, [isLoggedIn, authHeaders]);
 
   useEffect(() => {
     if (user) {
@@ -162,11 +173,11 @@ const AppointmentBooking: React.FC = () => {
       contactNumber,
       reason,
       appointmentType,
-      doctorId: selectedDoctor.id,
-      doctorName: selectedDoctor.name,
-      specialization: selectedDoctor.specialization,
-      department: selectedDoctor.department,
-      hospital: selectedDoctor.hospital,
+      doctorId: String(selectedDoctor.id),
+      doctorName: selectedDoctor.fullName,
+      specialization: specializationName(selectedDoctor.specializationId),
+      department: specializationName(selectedDoctor.specializationId),
+      hospital: DEFAULT_HOSPITAL_LABEL,
       date,
       timeSlot,
       queueNumber,
@@ -233,25 +244,42 @@ const AppointmentBooking: React.FC = () => {
       <p className="text-muted-foreground mb-6 text-sm md:text-base">
         Select a doctor for your appointment. You can view their specialization and department before proceeding.
       </p>
+      {doctorsError && (
+        <Card className="p-4 mb-5 border-red-200 bg-red-50 text-red-700 text-sm">
+          {doctorsError}
+        </Card>
+      )}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {doctors.map((doc) => (
-          <Card
-            key={doc.id}
-            className={
-              'text-left hover:border-primary/40 transition p-4 flex flex-col gap-2 cursor-pointer ' +
-              (selectedDoctorId === doc.id ? 'border-primary' : 'border-border')
-            }
-            onClick={() => {
-              setSelectedDoctorId(doc.id);
-              setStep('dateTime');
-            }}
-          >
-            <div className="font-semibold text-foreground">{doc.name}</div>
-            <div className="text-primary text-sm">{doc.specialization}</div>
-            <div className="text-muted-foreground text-xs">{doc.department}</div>
-            <div className="text-muted-foreground text-xs mt-1 line-clamp-3">{doc.description}</div>
+        {doctorsLoading ? (
+          <Card className="p-5 text-sm text-muted-foreground md:col-span-3">
+            Loading doctors...
           </Card>
-        ))}
+        ) : doctors.length === 0 ? (
+          <Card className="p-5 text-sm text-muted-foreground md:col-span-3">
+            No confirmed doctors available right now.
+          </Card>
+        ) : (
+          doctors.map((doc) => (
+            <Card
+              key={doc.id}
+              className={
+                'text-left hover:border-primary/40 transition p-4 flex flex-col gap-2 cursor-pointer ' +
+                (selectedDoctorId === doc.id ? 'border-primary' : 'border-border')
+              }
+              onClick={() => {
+                setSelectedDoctorId(doc.id);
+                setStep('dateTime');
+              }}
+            >
+              <div className="font-semibold text-foreground">{doc.fullName}</div>
+              <div className="text-primary text-sm">{specializationName(doc.specializationId)}</div>
+              <div className="text-muted-foreground text-xs">{specializationName(doc.specializationId)}</div>
+              <div className="text-muted-foreground text-xs mt-1 line-clamp-3">
+                {doc.description || 'No description provided.'}
+              </div>
+            </Card>
+          ))
+        )}
       </div>
     </Card>
   );
@@ -263,11 +291,11 @@ const AppointmentBooking: React.FC = () => {
         {renderStepHeader()}
         <div className="flex flex-col md:flex-row gap-6 mb-6">
           <div className="flex-1">
-            <h2 className="text-xl font-bold text-foreground mb-1">{selectedDoctor.name}</h2>
-            <div className="text-primary text-sm mb-1">{selectedDoctor.specialization}</div>
-            <div className="text-muted-foreground text-sm mb-2">{selectedDoctor.department}</div>
-            <p className="text-muted-foreground text-sm">{selectedDoctor.description}</p>
-            <p className="text-muted-foreground text-xs mt-2">{selectedDoctor.hospital}</p>
+            <h2 className="text-xl font-bold text-foreground mb-1">{selectedDoctor.fullName}</h2>
+            <div className="text-primary text-sm mb-1">{specializationName(selectedDoctor.specializationId)}</div>
+            <div className="text-muted-foreground text-sm mb-2">{specializationName(selectedDoctor.specializationId)}</div>
+            <p className="text-muted-foreground text-sm">{selectedDoctor.description || 'No description provided.'}</p>
+            <p className="text-muted-foreground text-xs mt-2">{DEFAULT_HOSPITAL_LABEL}</p>
           </div>
           <Card className="flex-1 bg-muted p-4 text-sm text-muted-foreground border-border">
             <h3 className="font-semibold text-foreground mb-2">Appointment Info</h3>
@@ -292,7 +320,7 @@ const AppointmentBooking: React.FC = () => {
           <div className="space-y-2">
             <Label className="text-foreground">Select Time Slot</Label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {selectedDoctor.availableSlots.map((slot) => (
+              {DEFAULT_TIME_SLOTS.map((slot) => (
                 <Button
                   key={slot}
                   type="button"
@@ -410,10 +438,10 @@ const AppointmentBooking: React.FC = () => {
         <div className="grid md:grid-cols-2 gap-6 mb-6 text-sm">
           <div className="space-y-2">
             <h3 className="font-semibold text-foreground mb-1">Doctor</h3>
-            <p className="text-muted-foreground">{selectedDoctor.name}</p>
-            <p className="text-primary">{selectedDoctor.specialization}</p>
-            <p className="text-muted-foreground">{selectedDoctor.department}</p>
-            <p className="text-muted-foreground text-xs mt-1">{selectedDoctor.hospital}</p>
+            <p className="text-muted-foreground">{selectedDoctor.fullName}</p>
+            <p className="text-primary">{specializationName(selectedDoctor.specializationId)}</p>
+            <p className="text-muted-foreground">{specializationName(selectedDoctor.specializationId)}</p>
+            <p className="text-muted-foreground text-xs mt-1">{DEFAULT_HOSPITAL_LABEL}</p>
           </div>
           <div className="space-y-2">
             <h3 className="font-semibold text-foreground mb-1">Appointment</h3>
