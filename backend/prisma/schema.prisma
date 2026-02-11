@@ -34,6 +34,7 @@ model User {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   doctor       Doctor?
+  appointments Appointment[]
 }
 
 model Doctor {
@@ -50,5 +51,31 @@ model Doctor {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id])
+  user         User          @relation(fields: [userId], references: [id])
+  appointments Appointment[]
+}
+
+enum AppointmentStatus {
+  UPCOMING
+  COMPLETED
+  CANCELLED
+}
+
+model Appointment {
+  id              Int               @id @default(autoincrement()) @map("appointment_id")
+  doctorId        Int               @map("doctor_id")
+  userId          String?           @db.VarChar(36) @map("user_id")
+  patientName     String            @db.VarChar(150) @map("patient_name")
+  contactNumber   String            @db.VarChar(20) @map("contact_number")
+  reason          String?           @db.Text
+  appointmentType String            @db.VarChar(50) @map("appointment_type")
+  date            DateTime          @db.Date
+  timeSlot        String            @db.VarChar(10) @map("time_slot")
+  queueNumber     Int               @map("queue_number")
+  status          AppointmentStatus @default(UPCOMING)
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+
+  doctor Doctor @relation(fields: [doctorId], references: [id])
+  user   User?  @relation(fields: [userId], references: [id])
 }
