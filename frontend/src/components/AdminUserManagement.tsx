@@ -3,6 +3,27 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { useAuth } from '../auth';
 import { SPECIALIZATIONS } from '../constants/specializations';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 type ManagedRole = 'ADMIN' | 'STAFF' | 'DOCTOR' | 'NURSE' | 'USER';
 
@@ -27,7 +48,6 @@ const initialStaffForm = {
   phone: '',
   password: '',
   role: 'STAFF' as ManagedRole,
-  // Doctor-specific fields (used when role === 'DOCTOR')
   slmcNumber: '',
   specializationId: 0,
   description: '',
@@ -186,247 +206,232 @@ export default function AdminUserManagement() {
       <section>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">All Users</h2>
-          <button
-            type="button"
-            className="text-sm text-primary-700 hover:underline"
-            onClick={() => void fetchUsers()}
-          >
+          <Button variant="link" size="sm" className="text-primary-700" onClick={() => void fetchUsers()}>
             Refresh
-          </button>
+          </Button>
         </div>
-        {error && <div className="mb-4 text-sm text-red-600">{error}</div>}
-        {banner && <div className="mb-4 text-sm text-green-600">{banner}</div>}
-        <div className="overflow-x-auto">
-          <table className="min-w-full border border-gray-200 rounded-lg">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-600">Name</th>
-                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-600">Email</th>
-                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-600">Phone</th>
-                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-600">Role</th>
-                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-600">Status</th>
-                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-600">Confirmation</th>
-                <th className="px-4 py-2" />
-              </tr>
-            </thead>
-            <tbody>
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        {banner && (
+          <Alert className="mb-4 border-green-200 bg-green-50">
+            <AlertDescription className="text-green-700">{banner}</AlertDescription>
+          </Alert>
+        )}
+        <div className="overflow-x-auto rounded-lg border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Phone</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Confirmation</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {loading ? (
-                <tr>
-                  <td colSpan={7} className="px-4 py-10 text-center text-sm text-gray-500">
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-10 text-muted-foreground">
                     Loading users...
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ) : users.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="px-4 py-10 text-center text-sm text-gray-500">
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-10 text-muted-foreground">
                     No users found.
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ) : (
                 users.map(user => {
                   const selectedRole = roleSelection[user.id] ?? user.role;
                   const roleChanged = selectedRole !== user.role;
                   return (
-                    <tr key={user.id} className="border-t border-gray-200">
-                      <td className="px-4 py-3 text-sm text-gray-700">
+                    <TableRow key={user.id}>
+                      <TableCell className="font-medium">
                         {user.firstName} {user.lastName}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-700">{user.email}</td>
-                      <td className="px-4 py-3 text-sm text-gray-700">{user.phone}</td>
-                      <td className="px-4 py-3 text-sm text-gray-700">
-                        <select
-                          className="border border-gray-300 rounded px-2 py-1 text-sm"
-                          value={selectedRole}
-                          onChange={event => handleRoleChange(user.id, event.target.value as ManagedRole)}
-                        >
-                          {roleOptions.map(role => (
-                            <option key={role} value={role}>
-                              {role}
-                            </option>
-                          ))}
-                        </select>
-                        <button
-                          type="button"
-                          className="ml-2 text-sm text-primary-700 disabled:text-gray-400"
-                          disabled={!roleChanged}
-                          onClick={() => void updateRole(user.id)}
-                        >
-                          Save
-                        </button>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-700">{user.status}</td>
-                      <td className="px-4 py-3 text-sm">
-                        {user.isConfirmed ? (
-                          <span className="inline-flex items-center px-2 py-1 rounded bg-green-50 text-green-700 text-xs font-semibold">
-                            Confirmed
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-2 py-1 rounded bg-yellow-50 text-yellow-700 text-xs font-semibold">
-                            Pending
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        {!user.isConfirmed && (
-                          <button
-                            type="button"
-                            className="text-sm text-white bg-primary-600 hover:bg-primary-700 px-3 py-1 rounded"
-                            onClick={() => void confirmUser(user.id)}
+                      </TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>{user.phone}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Select
+                            value={selectedRole}
+                            onValueChange={(value) => handleRoleChange(user.id, value as ManagedRole)}
                           >
-                            Confirm Account
-                          </button>
+                            <SelectTrigger className="w-[120px] h-8 text-sm">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {roleOptions.map(role => (
+                                <SelectItem key={role} value={role}>{role}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            variant="link"
+                            size="sm"
+                            className="text-primary-700"
+                            disabled={!roleChanged}
+                            onClick={() => void updateRole(user.id)}
+                          >
+                            Save
+                          </Button>
+                        </div>
+                      </TableCell>
+                      <TableCell>{user.status}</TableCell>
+                      <TableCell>
+                        {user.isConfirmed ? (
+                          <Badge variant="secondary" className="bg-green-50 text-green-700 hover:bg-green-50">
+                            Confirmed
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                            Pending
+                          </Badge>
                         )}
-                      </td>
-                    </tr>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {!user.isConfirmed && (
+                          <Button size="sm" onClick={() => void confirmUser(user.id)}>
+                            Confirm Account
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
                   );
                 })
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </section>
 
       <section>
         <h2 className="text-xl font-semibold mb-4">Register Staff</h2>
-        {staffError && <div className="mb-4 text-sm text-red-600">{staffError}</div>}
-        {staffSuccess && <div className="mb-4 text-sm text-green-600">{staffSuccess}</div>}
+        {staffError && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>{staffError}</AlertDescription>
+          </Alert>
+        )}
+        {staffSuccess && (
+          <Alert className="mb-4 border-green-200 bg-green-50">
+            <AlertDescription className="text-green-700">{staffSuccess}</AlertDescription>
+          </Alert>
+        )}
         <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={submitStaff}>
-          <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="staff-first-name">
-              First Name
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="staff-first-name">First Name</Label>
+            <Input
               id="staff-first-name"
               type="text"
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
               value={staffForm.firstName}
               onChange={event => handleStaffFormChange('firstName', event.target.value)}
               required
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="staff-last-name">
-              Last Name
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="staff-last-name">Last Name</Label>
+            <Input
               id="staff-last-name"
               type="text"
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
               value={staffForm.lastName}
               onChange={event => handleStaffFormChange('lastName', event.target.value)}
               required
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="staff-email">
-              Email
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="staff-email">Email</Label>
+            <Input
               id="staff-email"
               type="email"
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
               value={staffForm.email}
               onChange={event => handleStaffFormChange('email', event.target.value)}
               required
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="staff-phone">
-              Phone
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="staff-phone">Phone</Label>
+            <Input
               id="staff-phone"
               type="tel"
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
               value={staffForm.phone}
               onChange={event => handleStaffFormChange('phone', event.target.value)}
               required
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="staff-password">
-              Temporary Password
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="staff-password">Temporary Password</Label>
+            <Input
               id="staff-password"
               type="password"
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
               value={staffForm.password}
               onChange={event => handleStaffFormChange('password', event.target.value)}
               required
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="staff-role">
-              Role
-            </label>
-            <select
-              id="staff-role"
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+          <div className="space-y-2">
+            <Label htmlFor="staff-role">Role</Label>
+            <Select
               value={staffForm.role}
-              onChange={event => handleStaffFormChange('role', event.target.value as ManagedRole)}
+              onValueChange={(value) => handleStaffFormChange('role', value)}
             >
-              {roleOptions.map(role => (
-                <option key={role} value={role}>
-                  {role}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {roleOptions.map(role => (
+                  <SelectItem key={role} value={role}>{role}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           {staffForm.role === 'DOCTOR' && (
             <>
-              <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="staff-slmc-number">
-                  SLMC Number
-                </label>
-                <input
+              <div className="space-y-2">
+                <Label htmlFor="staff-slmc-number">SLMC Number</Label>
+                <Input
                   id="staff-slmc-number"
                   type="text"
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                   value={staffForm.slmcNumber}
                   onChange={event => handleStaffFormChange('slmcNumber', event.target.value)}
                   required
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="staff-specialization-id">
-                  Specialization
-                </label>
-                <select
-                  id="staff-specialization-id"
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                  value={staffForm.specializationId}
-                  onChange={event => handleStaffFormChange('specializationId', Number(event.target.value))}
-                  required
+              <div className="space-y-2">
+                <Label htmlFor="staff-specialization-id">Specialization</Label>
+                <Select
+                  value={staffForm.specializationId ? String(staffForm.specializationId) : ''}
+                  onValueChange={(value) => handleStaffFormChange('specializationId', Number(value))}
                 >
-                  <option value={0}>Select specialization…</option>
-                  {SPECIALIZATIONS.map(spec => (
-                    <option key={spec.id} value={spec.id}>
-                      {spec.name}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select specialization…" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SPECIALIZATIONS.map(spec => (
+                      <SelectItem key={spec.id} value={String(spec.id)}>{spec.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="staff-description">
-                  Doctor Description
-                </label>
-                <textarea
+              <div className="space-y-2">
+                <Label htmlFor="staff-description">Doctor Description</Label>
+                <Textarea
                   id="staff-description"
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                   value={staffForm.description}
                   onChange={event => handleStaffFormChange('description', event.target.value)}
                   rows={3}
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="staff-joined-date">
-                  Joined Date
-                </label>
-                <input
+              <div className="space-y-2">
+                <Label htmlFor="staff-joined-date">Joined Date</Label>
+                <Input
                   id="staff-joined-date"
                   type="date"
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                   value={staffForm.joinedDate}
                   onChange={event => handleStaffFormChange('joinedDate', event.target.value)}
                 />
@@ -434,13 +439,9 @@ export default function AdminUserManagement() {
             </>
           )}
           <div className="md:col-span-2 flex justify-end">
-            <button
-              type="submit"
-              className="px-4 py-2 rounded bg-primary-600 text-white text-sm font-medium hover:bg-primary-700 disabled:opacity-50"
-              disabled={staffSubmitting}
-            >
+            <Button type="submit" disabled={staffSubmitting}>
               {staffSubmitting ? 'Creating…' : 'Create Staff Account'}
-            </button>
+            </Button>
           </div>
         </form>
       </section>

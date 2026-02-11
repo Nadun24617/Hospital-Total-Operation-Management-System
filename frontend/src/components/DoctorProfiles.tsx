@@ -3,6 +3,26 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { useAuth } from '../auth';
 import { SPECIALIZATIONS } from '../constants/specializations';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface Doctor {
   id: number;
@@ -111,23 +131,25 @@ export default function DoctorProfiles() {
     };
 
     try {
-      let response;
+      let saved: Doctor;
       if (editingId) {
-        response = await axios.patch<Doctor>(
+        const response = await axios.patch<Doctor>(
           `${import.meta.env.VITE_API_URL}/doctors/${editingId}`,
           payload,
           { headers: authHeaders }
         );
-        setDoctors(prev => prev.map(d => (d.id === editingId ? response!.data : d)));
+        saved = response.data;
+        setDoctors(prev => prev.map(d => (d.id === editingId ? saved : d)));
         setBanner('Doctor details updated.');
       } else {
-        response = await axios.post<Doctor>(`${import.meta.env.VITE_API_URL}/doctors`, payload, {
+        const response = await axios.post<Doctor>(`${import.meta.env.VITE_API_URL}/doctors`, payload, {
           headers: authHeaders
         });
-        setDoctors(prev => [...prev, response.data]);
+        saved = response.data;
+        setDoctors(prev => [...prev, saved]);
         setBanner('Doctor profile created.');
       }
-      setEditingId(response.data.id);
+      setEditingId(saved.id);
     } catch (err) {
       if (axios.isAxiosError(err)) {
         setError(err.response?.data?.message ?? 'Could not save doctor.');
@@ -145,199 +167,167 @@ export default function DoctorProfiles() {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Doctor Profiles</h2>
           <div className="flex gap-2">
-            <button
-              type="button"
-              className="text-sm text-primary-700 hover:underline"
-              onClick={() => void fetchDoctors()}
-            >
+            <Button variant="link" size="sm" className="text-primary-700" onClick={() => void fetchDoctors()}>
               Refresh
-            </button>
-            <button
-              type="button"
-              className="text-sm text-primary-700 hover:underline"
-              onClick={startCreate}
-            >
+            </Button>
+            <Button variant="link" size="sm" className="text-primary-700" onClick={startCreate}>
               New Doctor
-            </button>
+            </Button>
           </div>
         </div>
-        {error && <div className="mb-4 text-sm text-red-600">{error}</div>}
-        {banner && <div className="mb-4 text-sm text-green-600">{banner}</div>}
-        <div className="overflow-x-auto">
-          <table className="min-w-full border border-gray-200 rounded-lg">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-600">Name</th>
-                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-600">SLMC No.</th>
-                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-600">Specialization</th>
-                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-600">Phone</th>
-                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-600">Email</th>
-                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-600">Joined Date</th>
-                <th className="px-4 py-2" />
-              </tr>
-            </thead>
-            <tbody>
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        {banner && (
+          <Alert className="mb-4 border-green-200 bg-green-50">
+            <AlertDescription className="text-green-700">{banner}</AlertDescription>
+          </Alert>
+        )}
+        <div className="overflow-x-auto rounded-lg border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>SLMC No.</TableHead>
+                <TableHead>Specialization</TableHead>
+                <TableHead>Phone</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Joined Date</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {loading ? (
-                <tr>
-                  <td colSpan={7} className="px-4 py-10 text-center text-sm text-gray-500">
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-10 text-muted-foreground">
                     Loading doctors...
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ) : doctors.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="px-4 py-10 text-center text-sm text-gray-500">
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-10 text-muted-foreground">
                     No doctors found.
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ) : (
                 doctors.map(doctor => (
-                  <tr key={doctor.id} className="border-t border-gray-200">
-                    <td className="px-4 py-3 text-sm text-gray-700">{doctor.fullName}</td>
-                    <td className="px-4 py-3 text-sm text-gray-700">{doctor.slmcNumber}</td>
-                    <td className="px-4 py-3 text-sm text-gray-700">
+                  <TableRow key={doctor.id}>
+                    <TableCell className="font-medium">{doctor.fullName}</TableCell>
+                    <TableCell>{doctor.slmcNumber}</TableCell>
+                    <TableCell>
                       {SPECIALIZATIONS.find(s => s.id === doctor.specializationId)?.name ||
                         (doctor.specializationId ? `#${doctor.specializationId}` : '-')}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-700">{doctor.phone || '-'}</td>
-                    <td className="px-4 py-3 text-sm text-gray-700">{doctor.email || '-'}</td>
-                    <td className="px-4 py-3 text-sm text-gray-700">
+                    </TableCell>
+                    <TableCell>{doctor.phone || '-'}</TableCell>
+                    <TableCell>{doctor.email || '-'}</TableCell>
+                    <TableCell>
                       {doctor.joinedDate ? doctor.joinedDate.substring(0, 10) : '-'}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <button
-                        type="button"
-                        className="text-sm text-primary-700 hover:underline"
-                        onClick={() => startEdit(doctor)}
-                      >
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="link" size="sm" className="text-primary-700" onClick={() => startEdit(doctor)}>
                         Edit
-                      </button>
-                    </td>
-                  </tr>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
                 ))
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </section>
 
       <section>
         <h2 className="text-xl font-semibold mb-4">{editingId ? 'Edit Doctor' : 'Create Doctor'}</h2>
         <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={handleSubmit}>
-          <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="doctor-user-id">
-              User ID
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="doctor-user-id">User ID</Label>
+            <Input
               id="doctor-user-id"
               type="text"
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
               value={form.userId}
               onChange={event => handleChange('userId', event.target.value)}
               required
             />
-            <p className="mt-1 text-xs text-gray-500">Linked application user ID (cuid).</p>
+            <p className="text-xs text-muted-foreground">Linked application user ID (cuid).</p>
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="doctor-full-name">
-              Full Name
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="doctor-full-name">Full Name</Label>
+            <Input
               id="doctor-full-name"
               type="text"
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
               value={form.fullName}
               onChange={event => handleChange('fullName', event.target.value)}
               required
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="doctor-slmc-number">
-              SLMC Number
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="doctor-slmc-number">SLMC Number</Label>
+            <Input
               id="doctor-slmc-number"
               type="text"
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
               value={form.slmcNumber}
               onChange={event => handleChange('slmcNumber', event.target.value)}
               required
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="doctor-specialization-id">
-              Specialization
-            </label>
-            <select
-              id="doctor-specialization-id"
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-              value={form.specializationId}
-              onChange={event => handleChange('specializationId', Number(event.target.value))}
-              required
+          <div className="space-y-2">
+            <Label htmlFor="doctor-specialization-id">Specialization</Label>
+            <Select
+              value={form.specializationId ? String(form.specializationId) : ''}
+              onValueChange={(value) => handleChange('specializationId', Number(value))}
             >
-              <option value={0}>Select specialization…</option>
-              {SPECIALIZATIONS.map(spec => (
-                <option key={spec.id} value={spec.id}>
-                  {spec.name}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select specialization…" />
+              </SelectTrigger>
+              <SelectContent>
+                {SPECIALIZATIONS.map(spec => (
+                  <SelectItem key={spec.id} value={String(spec.id)}>{spec.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="doctor-phone">
-              Phone
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="doctor-phone">Phone</Label>
+            <Input
               id="doctor-phone"
               type="tel"
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
               value={form.phone ?? ''}
               onChange={event => handleChange('phone', event.target.value)}
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="doctor-email">
-              Email
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="doctor-email">Email</Label>
+            <Input
               id="doctor-email"
               type="email"
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
               value={form.email ?? ''}
               onChange={event => handleChange('email', event.target.value)}
             />
           </div>
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium mb-1" htmlFor="doctor-description">
-              Description
-            </label>
-            <textarea
+          <div className="md:col-span-2 space-y-2">
+            <Label htmlFor="doctor-description">Description</Label>
+            <Textarea
               id="doctor-description"
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
               rows={3}
               value={form.description ?? ''}
               onChange={event => handleChange('description', event.target.value)}
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="doctor-joined-date">
-              Joined Date
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="doctor-joined-date">Joined Date</Label>
+            <Input
               id="doctor-joined-date"
               type="date"
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
               value={form.joinedDate ?? ''}
               onChange={event => handleChange('joinedDate', event.target.value)}
             />
           </div>
           <div className="md:col-span-2 flex justify-end">
-            <button
-              type="submit"
-              className="px-4 py-2 rounded bg-primary-600 text-white text-sm font-medium hover:bg-primary-700 disabled:opacity-50"
-              disabled={submitting}
-            >
+            <Button type="submit" disabled={submitting}>
               {submitting ? 'Saving…' : editingId ? 'Save Changes' : 'Create Doctor'}
-            </button>
+            </Button>
           </div>
         </form>
       </section>

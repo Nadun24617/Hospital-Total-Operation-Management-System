@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import PatientDashboardNavBar from '../components/PatientDashboardNavBar';
 import Footer from '../components/Footer';
-
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const navLinks = [
   { label: 'About Us', id: 'hospital' },
@@ -23,15 +23,12 @@ const PatientDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
-      {/* Navigation bar */}
       <div className="relative">
         <PatientDashboardNavBar navLinks={navLinks} />
       </div>
 
-      {/* Landing Page Content */}
       <main className="max-w-6xl mx-auto mt-8 p-4 space-y-12">
-        {/* ...existing code... */}
-        <section className="bg-white rounded-3xl shadow p-8 md:p-10 flex flex-col md:flex-row items-center gap-8">
+        <Card className="rounded-3xl shadow p-8 md:p-10 flex flex-col md:flex-row items-center gap-8">
           <div className="flex-1">
             <p className="text-sm uppercase tracking-[0.2em] text-blue-500 mb-2">Welcome to ABC Hospital</p>
             <h1 className="text-3xl md:text-4xl font-bold text-blue-800 mb-3">
@@ -46,18 +43,18 @@ const PatientDashboard: React.FC = () => {
               Modern hospital illustration / hero image
             </div>
           </div>
-        </section>
-        {/* ...existing code... */}
+        </Card>
+
         <section>
           <h2 className="text-xl font-semibold text-blue-800 mb-4">Quick Access</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             {quickAccessCards.map(card => {
               const clickable = Boolean(card.onClick);
               return (
-                <div
+                <Card
                   key={card.title}
                   className={
-                    'bg-white rounded-2xl shadow transition p-5 flex flex-col gap-2 ' +
+                    'rounded-2xl transition p-5 flex flex-col gap-2 ' +
                     (clickable ? 'hover:shadow-lg cursor-pointer' : '')
                   }
                   onClick={card.onClick}
@@ -65,66 +62,78 @@ const PatientDashboard: React.FC = () => {
                   <span className="text-3xl">{card.icon}</span>
                   <div className="font-semibold text-blue-800">{card.title}</div>
                   <div className="text-gray-500 text-sm">{card.desc}</div>
-                </div>
+                </Card>
               );
             })}
           </div>
         </section>
-        {/* ...existing code... */}
+
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-          <div className="bg-white rounded-2xl shadow p-6 flex flex-col gap-4">
-            <h3 className="text-lg font-semibold text-blue-800">Hospital at a Glance</h3>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <div className="text-2xl font-bold text-blue-700">500+</div>
-                <div className="text-gray-500">Specialist Doctors</div>
+          <Card className="rounded-2xl">
+            <CardHeader>
+              <CardTitle className="text-lg text-blue-800">Hospital at a Glance</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <div className="text-2xl font-bold text-blue-700">500+</div>
+                  <div className="text-gray-500">Specialist Doctors</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-blue-700">24/7</div>
+                  <div className="text-gray-500">Emergency Services</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-blue-700">10+</div>
+                  <div className="text-gray-500">Advanced Departments</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-blue-700">98%</div>
+                  <div className="text-gray-500">Patient Satisfaction</div>
+                </div>
               </div>
-              <div>
-                <div className="text-2xl font-bold text-blue-700">24/7</div>
-                <div className="text-gray-500">Emergency Services</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-blue-700">10+</div>
-                <div className="text-gray-500">Advanced Departments</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-blue-700">98%</div>
-                <div className="text-gray-500">Patient Satisfaction</div>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-2xl shadow p-6 flex flex-col gap-3">
-            <h3 className="text-lg font-semibold text-blue-800">What Our Patients Say</h3>
-            <p className="text-gray-600 text-sm italic">
-              “ABC Hospital made my surgery journey smooth and stress-free. The staff were caring, and all my reports were available online in seconds.”
-            </p>
-            <div className="text-sm text-gray-500">— Patient Feedback</div>
-          </div>
-          <div className="bg-white rounded-2xl shadow p-6 flex flex-col gap-3">
-            <h3 className="text-lg font-semibold text-blue-800">Latest Updates</h3>
-            <ul className="text-sm text-gray-600 space-y-2">
-              <li>• Free heart health camp – 25th Dec</li>
-              <li>• COVID-19 booster vaccination drive ongoing</li>
-              <li>• New oncology wing inaugurated</li>
-            </ul>
-          </div>
+            </CardContent>
+          </Card>
+          <Card className="rounded-2xl">
+            <CardHeader>
+              <CardTitle className="text-lg text-blue-800">What Our Patients Say</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-3">
+              <p className="text-gray-600 text-sm italic">
+                "ABC Hospital made my surgery journey smooth and stress-free. The staff were caring, and all my reports were available online in seconds."
+              </p>
+              <div className="text-sm text-gray-500">— Patient Feedback</div>
+            </CardContent>
+          </Card>
+          <Card className="rounded-2xl">
+            <CardHeader>
+              <CardTitle className="text-lg text-blue-800">Latest Updates</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="text-sm text-gray-600 space-y-2">
+                <li>• Free heart health camp – 25th Dec</li>
+                <li>• COVID-19 booster vaccination drive ongoing</li>
+                <li>• New oncology wing inaugurated</li>
+              </ul>
+            </CardContent>
+          </Card>
         </section>
-        {/* ...existing code... */}
-        <section className="bg-white rounded-2xl shadow p-6 md:p-8">
+
+        <Card className="rounded-2xl p-6 md:p-8">
           <h2 className="text-xl font-semibold text-blue-800 mb-4">Who Can Use This Portal?</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            {[ 
+            {[
               { title: 'Patients', desc: 'Manage appointments, records, and bills in one place.' },
               { title: 'Doctors', desc: 'Access schedules, patient charts, and clinical data.' },
               { title: 'Staff / Admin', desc: 'Oversee operations, billing, and analytics.' },
             ].map(role => (
-              <div key={role.title} className="rounded-xl border border-blue-100 p-4 bg-blue-50/40">
+              <Card key={role.title} className="rounded-xl border-blue-100 bg-blue-50/40 p-4">
                 <div className="font-semibold text-blue-800 mb-1">{role.title}</div>
                 <div className="text-gray-600 text-sm">{role.desc}</div>
-              </div>
+              </Card>
             ))}
           </div>
-        </section>  
+        </Card>
       </main>
       <Footer />
     </div>
