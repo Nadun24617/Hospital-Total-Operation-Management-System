@@ -1,6 +1,19 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Separator } from '@/components/ui/separator';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 
 interface StatCardProps {
   label: string;
@@ -17,10 +30,10 @@ function StatCard({ label, value, accent = 'primary' }: StatCardProps) {
   };
 
   return (
-    <div className={`flex flex-col justify-between rounded-2xl border shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 px-4 py-3 sm:px-5 sm:py-4 ${accentClasses[accent]}`}>
+    <Card className={`rounded-2xl hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 px-4 py-3 sm:px-5 sm:py-4 ${accentClasses[accent]}`}>
       <span className="text-xs sm:text-[0.8rem] font-medium tracking-wide text-gray-600/80 uppercase">{label}</span>
-      <span className="mt-1 text-xl sm:text-2xl font-semibold leading-tight">{value}</span>
-    </div>
+      <span className="mt-1 text-xl sm:text-2xl font-semibold leading-tight block">{value}</span>
+    </Card>
   );
 }
 
@@ -30,7 +43,6 @@ export default function DoctorDashboard() {
   const [collapsed, setCollapsed] = useState(false);
   const [activeSection, setActiveSection] = useState<'dashboard' | 'appointments' | 'patients' | 'schedule' | 'history' | 'profile'>('dashboard');
 
-  // Placeholder demo data – ready to be wired to API later
   const todaySummary = {
     todaysAppointments: 12,
     nextPatient: 'John Doe',
@@ -101,46 +113,48 @@ export default function DoctorDashboard() {
               </div>
             )}
           </div>
-          <button
-            type="button"
+          <Button
+            variant="outline"
+            size="sm"
+            className="ml-2 h-8 w-8 rounded-full p-0"
             onClick={() => setCollapsed(prev => !prev)}
-            className="ml-2 inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-colors"
             aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}
           >
             <span className="text-xs">{collapsed ? '»' : '«'}</span>
-          </button>
+          </Button>
         </div>
 
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
           {navItems.map(item => {
             const isActive = activeSection === item.id;
             return (
-              <button
+              <Button
                 key={item.id}
-                type="button"
-                onClick={() => setActiveSection(item.id)}
-                className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-1 focus-visible:ring-offset-white ${
+                variant={isActive ? 'secondary' : 'ghost'}
+                className={`w-full justify-start gap-3 rounded-xl px-3 py-2.5 text-sm font-medium ${
                   isActive
-                    ? 'bg-primary-50 text-primary-800 shadow-sm'
+                    ? 'bg-primary-50 text-primary-800 shadow-sm hover:bg-primary-50'
                     : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                 }`}
+                onClick={() => setActiveSection(item.id)}
               >
                 {item.icon}
                 {!collapsed && <span className="truncate">{item.label}</span>}
-              </button>
+              </Button>
             );
           })}
         </nav>
 
-        <div className="mt-auto border-t border-slate-100 px-3 py-4">
-          <button
-            type="button"
+        <Separator />
+        <div className="px-3 py-4">
+          <Button
+            variant="destructive"
+            className="w-full rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 hover:text-rose-700"
             onClick={handleLogout}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-rose-50 px-3 py-2.5 text-sm font-semibold text-rose-600 hover:bg-rose-100 transition-colors"
           >
-            <span className="text-base">⎋</span>
+            <span className="text-base mr-2">⎋</span>
             {!collapsed && <span>Logout</span>}
-          </button>
+          </Button>
         </div>
       </aside>
 
@@ -166,9 +180,11 @@ export default function DoctorDashboard() {
               <span className="font-medium text-slate-700">{user?.firstName} {user?.lastName}</span>
               <span className="uppercase tracking-wide text-[0.65rem]">{user?.role ?? 'DOCTOR'}</span>
             </div>
-            <div className="h-9 w-9 rounded-full bg-primary-600 text-white flex items-center justify-center text-sm font-semibold shadow-inner">
-              {user?.firstName?.[0] ?? 'D'}
-            </div>
+            <Avatar className="h-9 w-9">
+              <AvatarFallback className="bg-primary-600 text-white text-sm font-semibold">
+                {user?.firstName?.[0] ?? 'D'}
+              </AvatarFallback>
+            </Avatar>
           </div>
         </header>
 
@@ -178,7 +194,7 @@ export default function DoctorDashboard() {
             <>
               {/* Top stats row */}
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
-                <StatCard label="Today\'s Appointments" value={todaySummary.todaysAppointments} accent="primary" />
+                <StatCard label="Today's Appointments" value={todaySummary.todaysAppointments} accent="primary" />
                 <StatCard label="Completed" value={todaySummary.completed} accent="green" />
                 <StatCard label="Pending" value={todaySummary.pending} accent="amber" />
                 <StatCard label="Cancellations" value={todaySummary.cancellations} accent="red" />
@@ -190,135 +206,145 @@ export default function DoctorDashboard() {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
                 {/* Left: Queue & next patient */}
                 <div className="lg:col-span-5 xl:col-span-4 space-y-4">
-                  <div className="rounded-2xl bg-white/90 shadow-sm hover:shadow-md transition-shadow duration-200 p-4 sm:p-5 flex flex-col gap-3">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-sm sm:text-base font-semibold text-slate-900">Next Patient</h2>
-                      <span className="rounded-full bg-primary-50 px-2 py-0.5 text-[0.7rem] font-medium text-primary-700 uppercase tracking-wide">Up next</span>
-                    </div>
-                    <div className="rounded-xl border border-slate-100 bg-slate-50/60 px-3 py-3 flex flex-col gap-1">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="font-semibold text-slate-900">{todaySummary.nextPatient}</span>
-                        <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[0.7rem] text-emerald-700 font-medium">In Clinic</span>
+                  <Card className="rounded-2xl hover:shadow-md transition-shadow duration-200">
+                    <CardContent className="p-4 sm:p-5 flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <h2 className="text-sm sm:text-base font-semibold text-slate-900">Next Patient</h2>
+                        <Badge variant="secondary" className="bg-primary-50 text-primary-700 hover:bg-primary-50">Up next</Badge>
                       </div>
-                      <div className="flex items-center justify-between text-xs text-slate-500">
-                        <span>Follow-up • General Medicine</span>
-                        <span>{todaySummary.nextSlot}</span>
+                      <div className="rounded-xl border border-slate-100 bg-slate-50/60 px-3 py-3 flex flex-col gap-1">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="font-semibold text-slate-900">{todaySummary.nextPatient}</span>
+                          <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 hover:bg-emerald-50">In Clinic</Badge>
+                        </div>
+                        <div className="flex items-center justify-between text-xs text-slate-500">
+                          <span>Follow-up • General Medicine</span>
+                          <span>{todaySummary.nextSlot}</span>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center justify-between text-xs text-slate-500 mt-1">
-                      <span>Current queue</span>
-                      <span className="font-semibold text-slate-800">{todaySummary.currentQueue} patients waiting</span>
-                    </div>
-                  </div>
+                      <div className="flex items-center justify-between text-xs text-slate-500 mt-1">
+                        <span>Current queue</span>
+                        <span className="font-semibold text-slate-800">{todaySummary.currentQueue} patients waiting</span>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-                  <div className="rounded-2xl bg-white/90 shadow-sm hover:shadow-md transition-shadow duration-200 p-4 sm:p-5">
+                  <Card className="rounded-2xl hover:shadow-md transition-shadow duration-200">
+                    <CardContent className="p-4 sm:p-5">
+                      <div className="flex items-center justify-between mb-3">
+                        <h2 className="text-sm sm:text-base font-semibold text-slate-900">Live Queue</h2>
+                        <span className="text-[0.7rem] text-slate-500 uppercase tracking-wide">Updated in real time</span>
+                      </div>
+                      <div className="space-y-2 text-xs sm:text-sm">
+                        <div className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
+                          <span className="font-medium text-slate-800">Token {todaySummary.liveNumber}</span>
+                          <span className="text-emerald-600 font-semibold">Now Serving</span>
+                        </div>
+                        <div className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
+                          <span className="text-slate-700">Next: A-18, A-19</span>
+                          <span className="text-slate-500">Approx 10 min</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Middle: Today's appointments */}
+                <Card className="lg:col-span-7 xl:col-span-5 rounded-2xl hover:shadow-md transition-shadow duration-200">
+                  <CardContent className="p-4 sm:p-5 flex flex-col">
                     <div className="flex items-center justify-between mb-3">
-                      <h2 className="text-sm sm:text-base font-semibold text-slate-900">Live Queue</h2>
-                      <span className="text-[0.7rem] text-slate-500 uppercase tracking-wide">Updated in real time</span>
-                    </div>
-                    <div className="space-y-2 text-xs sm:text-sm">
-                      <div className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
-                        <span className="font-medium text-slate-800">Token {todaySummary.liveNumber}</span>
-                        <span className="text-emerald-600 font-semibold">Now Serving</span>
+                      <div>
+                        <h2 className="text-sm sm:text-base font-semibold text-slate-900">Today's Appointments</h2>
+                        <p className="text-xs text-slate-500">Overview of upcoming patients for today.</p>
                       </div>
-                      <div className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
-                        <span className="text-slate-700">Next: A-18, A-19</span>
-                        <span className="text-slate-500">Approx 10 min</span>
-                      </div>
+                      <Button variant="outline" size="sm" className="rounded-full text-xs">
+                        View all
+                      </Button>
                     </div>
-                  </div>
-                </div>
-
-                {/* Middle: Today\'s appointments */}
-                <div className="lg:col-span-7 xl:col-span-5 rounded-2xl bg-white/90 shadow-sm hover:shadow-md transition-shadow duration-200 p-4 sm:p-5 flex flex-col">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <h2 className="text-sm sm:text-base font-semibold text-slate-900">Today\'s Appointments</h2>
-                      <p className="text-xs text-slate-500">Overview of upcoming patients for today.</p>
+                    <div className="-mx-3 sm:mx-0 flex-1 overflow-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow className="text-[0.7rem] uppercase tracking-wide text-slate-400">
+                            <TableHead className="font-medium">Time</TableHead>
+                            <TableHead className="font-medium">Patient</TableHead>
+                            <TableHead className="font-medium">Reason</TableHead>
+                            <TableHead className="font-medium text-right">Status</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {upcomingAppointments.map(row => (
+                            <TableRow key={`${row.time}-${row.name}`} className="hover:bg-slate-50/60">
+                              <TableCell className="whitespace-nowrap text-slate-700">{row.time}</TableCell>
+                              <TableCell className="text-slate-800 font-medium">{row.name}</TableCell>
+                              <TableCell className="text-slate-500">{row.reason}</TableCell>
+                              <TableCell className="text-right">
+                                <Badge
+                                  variant="secondary"
+                                  className={
+                                    row.status === 'Next'
+                                      ? 'bg-primary-50 text-primary-700 hover:bg-primary-50'
+                                      : 'bg-amber-50 text-amber-700 hover:bg-amber-50'
+                                  }
+                                >
+                                  {row.status}
+                                </Badge>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
                     </div>
-                    <button
-                      type="button"
-                      className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors"
-                    >
-                      View all
-                    </button>
-                  </div>
-                  <div className="-mx-3 sm:mx-0 flex-1 overflow-auto">
-                    <table className="min-w-full text-xs sm:text-sm">
-                      <thead>
-                        <tr className="text-left text-[0.7rem] uppercase tracking-wide text-slate-400 border-b border-slate-100">
-                          <th className="px-3 py-2 font-medium">Time</th>
-                          <th className="px-3 py-2 font-medium">Patient</th>
-                          <th className="px-3 py-2 font-medium">Reason</th>
-                          <th className="px-3 py-2 font-medium text-right">Status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {upcomingAppointments.map(row => (
-                          <tr key={`${row.time}-${row.name}`} className="border-b border-slate-50 hover:bg-slate-50/60 transition-colors">
-                            <td className="px-3 py-2 whitespace-nowrap text-slate-700">{row.time}</td>
-                            <td className="px-3 py-2 text-slate-800 font-medium">{row.name}</td>
-                            <td className="px-3 py-2 text-slate-500">{row.reason}</td>
-                            <td className="px-3 py-2 text-right">
-                              <span
-                                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[0.7rem] font-semibold ${
-                                  row.status === 'Next'
-                                    ? 'bg-primary-50 text-primary-700'
-                                    : 'bg-amber-50 text-amber-700'
-                                }`}
-                              >
-                                {row.status}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
 
                 {/* Right: Notifications & activity */}
                 <div className="lg:col-span-12 xl:col-span-3 space-y-4">
-                  <div className="rounded-2xl bg-white/90 shadow-sm hover:shadow-md transition-shadow duration-200 p-4 sm:p-5">
-                    <div className="flex items-center justify-between mb-3">
-                      <h2 className="text-sm sm:text-base font-semibold text-slate-900">Notifications</h2>
-                      <span className="text-[0.7rem] text-slate-400">Today</span>
-                    </div>
-                    <ul className="space-y-2 text-xs sm:text-sm">
-                      {notifications.map((note, idx) => (
-                        <li
-                          key={idx}
-                          className="rounded-xl border border-slate-100 bg-slate-50/60 px-3 py-2 hover:border-primary-100 hover:bg-primary-50/40 transition-colors"
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="text-[0.7rem] font-semibold uppercase tracking-wide text-slate-500">{note.type}</span>
-                            <span className="text-[0.7rem] text-slate-400">{note.time}</span>
-                          </div>
-                          <p className="mt-1 text-slate-700 text-xs sm:text-[0.8rem] leading-snug">{note.message}</p>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  <Card className="rounded-2xl hover:shadow-md transition-shadow duration-200">
+                    <CardContent className="p-4 sm:p-5">
+                      <div className="flex items-center justify-between mb-3">
+                        <h2 className="text-sm sm:text-base font-semibold text-slate-900">Notifications</h2>
+                        <span className="text-[0.7rem] text-slate-400">Today</span>
+                      </div>
+                      <ul className="space-y-2 text-xs sm:text-sm">
+                        {notifications.map((note, idx) => (
+                          <li
+                            key={idx}
+                            className="rounded-xl border border-slate-100 bg-slate-50/60 px-3 py-2 hover:border-primary-100 hover:bg-primary-50/40 transition-colors"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="text-[0.7rem] font-semibold uppercase tracking-wide text-slate-500">{note.type}</span>
+                              <span className="text-[0.7rem] text-slate-400">{note.time}</span>
+                            </div>
+                            <p className="mt-1 text-slate-700 text-xs sm:text-[0.8rem] leading-snug">{note.message}</p>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
 
-                  <div className="rounded-2xl bg-gradient-to-r from-primary-600 to-primary-500 text-white shadow-md px-4 py-4 sm:px-5 sm:py-4 flex flex-col gap-2">
-                    <div className="text-xs font-semibold uppercase tracking-[0.15em] text-white/75">Focus Mode</div>
-                    <div className="text-sm sm:text-base font-semibold">Keep your consultations distraction-free.</div>
-                    <p className="text-xs text-primary-50/90">
-                      Notifications are summarised here while you focus on one patient at a time.
-                    </p>
-                  </div>
+                  <Card className="rounded-2xl bg-gradient-to-r from-primary-600 to-primary-500 text-white shadow-md border-0">
+                    <CardContent className="px-4 py-4 sm:px-5 sm:py-4 flex flex-col gap-2">
+                      <div className="text-xs font-semibold uppercase tracking-[0.15em] text-white/75">Focus Mode</div>
+                      <div className="text-sm sm:text-base font-semibold">Keep your consultations distraction-free.</div>
+                      <p className="text-xs text-primary-50/90">
+                        Notifications are summarised here while you focus on one patient at a time.
+                      </p>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
             </>
           )}
 
           {activeSection !== 'dashboard' && (
-            <div className="rounded-2xl bg-white/90 shadow-sm p-6 text-sm text-slate-500 flex items-center justify-center">
-              <p>
-                The <span className="font-semibold text-slate-700">{navItems.find(n => n.id === activeSection)?.label}</span> section layout is ready.
-                Integrate backend data and detailed views as needed.
-              </p>
-            </div>
+            <Card className="rounded-2xl">
+              <CardContent className="p-6 text-sm text-slate-500 flex items-center justify-center">
+                <p>
+                  The <span className="font-semibold text-slate-700">{navItems.find(n => n.id === activeSection)?.label}</span> section layout is ready.
+                  Integrate backend data and detailed views as needed.
+                </p>
+              </CardContent>
+            </Card>
           )}
         </section>
       </main>
