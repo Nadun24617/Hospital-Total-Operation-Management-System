@@ -22,7 +22,8 @@ async function main() {
       phone: '+10000000000',
       passwordHash,
       role: 'ADMIN',
-      status: 'ACTIVE'
+      status: 'ACTIVE',
+      isConfirmed: true
     }
   });
 }
