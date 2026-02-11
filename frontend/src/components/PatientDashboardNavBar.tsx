@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAuth } from '../auth';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Heart, User, LogOut, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -61,116 +62,124 @@ const PatientDashboardNavBar: React.FC<PatientDashboardNavBarProps> = ({ navLink
   };
 
   return (
-    <nav className="w-full bg-white border-b border-border px-6 py-3 flex items-center">
-      <div className="text-xl font-semibold text-foreground select-none">ABC Hospital</div>
-      <div className="flex-1 flex items-center justify-center gap-2 md:gap-6">
-        <Button
-          variant={activeSection === 'home' ? 'secondary' : 'ghost'}
-          className={`min-h-[44px] px-4 text-lg font-medium ${
-            activeSection === 'home'
-              ? 'text-primary bg-accent font-semibold hover:bg-accent'
-              : 'text-muted-foreground hover:bg-accent'
-          }`}
+    <nav className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm border-b border-border px-6 py-2.5">
+      <div className="max-w-6xl mx-auto flex items-center">
+        {/* Brand */}
+        <button
           onClick={() => handleNavClick('home')}
-          aria-current={activeSection === 'home' ? 'page' : undefined}
+          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
-          Home
-        </Button>
-        {navLinks.map((link) => (
-          <Button
-            key={link.id}
-            variant={activeSection === link.id ? 'secondary' : 'ghost'}
-            className={`min-h-[44px] px-4 text-lg font-medium ${
-              activeSection === link.id
-                ? 'text-primary bg-accent font-semibold hover:bg-accent'
-                : 'text-muted-foreground hover:bg-accent'
+          <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Heart className="h-4.5 w-4.5 text-primary" />
+          </div>
+          <span className="text-lg font-bold text-foreground tracking-tight hidden sm:inline">ABC Hospital</span>
+        </button>
+
+        {/* Nav Links */}
+        <div className="flex-1 flex items-center justify-center gap-1">
+          <button
+            onClick={() => handleNavClick('home')}
+            className={`relative px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+              activeSection === 'home'
+                ? 'text-primary bg-primary/8'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
             }`}
-            onClick={() => handleNavClick(link.id)}
-            aria-current={activeSection === link.id ? 'page' : undefined}
+            aria-current={activeSection === 'home' ? 'page' : undefined}
           >
-            {link.label}
-          </Button>
-        ))}
-      </div>
-      <div className="flex items-center justify-end ml-4">
-        {!isLoggedIn && (
-          <Button
-            variant="outline"
-            className="border-border text-primary hover:bg-accent font-medium"
-            onClick={() => (window.location.href = '/login')}
-          >
-            Login
-          </Button>
-        )}
-        {isLoggedIn && (
-          <>
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              ref={fileInputRef}
-              onChange={handlePhotoChange}
-            />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0 border border-border">
-                  <Avatar className="h-10 w-10">
-                    {profilePhoto ? (
-                      <AvatarImage src={profilePhoto} alt="Profile" />
-                    ) : null}
-                    <AvatarFallback className="bg-muted text-muted-foreground">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="w-6 h-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
-                        />
-                      </svg>
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-64" align="end" sideOffset={8}>
-                <div className="flex flex-col items-center gap-2 p-4">
-                  <Avatar className="h-16 w-16 border border-border">
-                    {profilePhoto ? (
-                      <AvatarImage src={profilePhoto} alt="Profile" />
-                    ) : null}
-                    <AvatarFallback className="bg-muted text-muted-foreground">
-                      <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                      </svg>
-                    </AvatarFallback>
-                  </Avatar>
-                  <DropdownMenuLabel className="text-lg text-foreground">
-                    {user?.firstName || 'User'}
-                  </DropdownMenuLabel>
-                  <span className="text-muted-foreground text-sm">{user?.email || ''}</span>
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="cursor-pointer justify-center text-foreground font-medium"
-                  onClick={() => alert('Edit profile (implement as needed)')}
-                >
-                  Edit Profile
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="cursor-pointer justify-center text-destructive font-medium"
-                  onClick={() => logout()}
-                >
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
-        )}
+            Home
+            {activeSection === 'home' && (
+              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-0.5 bg-primary rounded-full" />
+            )}
+          </button>
+          {navLinks.map((link) => (
+            <button
+              key={link.id}
+              onClick={() => handleNavClick(link.id)}
+              className={`relative px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                activeSection === link.id
+                  ? 'text-primary bg-primary/8'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+              }`}
+              aria-current={activeSection === link.id ? 'page' : undefined}
+            >
+              {link.label}
+              {activeSection === link.id && (
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-0.5 bg-primary rounded-full" />
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Right side */}
+        <div className="flex items-center gap-2">
+          {!isLoggedIn && (
+            <Button
+              size="sm"
+              className="font-medium"
+              onClick={() => (window.location.href = '/login')}
+            >
+              Login
+            </Button>
+          )}
+          {isLoggedIn && (
+            <>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                ref={fileInputRef}
+                onChange={handlePhotoChange}
+              />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-9 w-9 rounded-full p-0">
+                    <Avatar className="h-9 w-9 border border-border">
+                      {profilePhoto ? (
+                        <AvatarImage src={profilePhoto} alt="Profile" />
+                      ) : null}
+                      <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
+                        {user?.firstName?.charAt(0)?.toUpperCase() || <User className="h-4 w-4" />}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" sideOffset={8}>
+                  <div className="flex items-center gap-3 px-3 py-3">
+                    <Avatar className="h-10 w-10 border border-border">
+                      {profilePhoto ? (
+                        <AvatarImage src={profilePhoto} alt="Profile" />
+                      ) : null}
+                      <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                        {user?.firstName?.charAt(0)?.toUpperCase() || <User className="h-5 w-5" />}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col">
+                      <DropdownMenuLabel className="p-0 text-sm font-semibold text-foreground">
+                        {user?.firstName || 'User'}
+                      </DropdownMenuLabel>
+                      <span className="text-xs text-muted-foreground">{user?.email || ''}</span>
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="cursor-pointer gap-2 text-foreground"
+                    onClick={() => alert('Edit profile (implement as needed)')}
+                  >
+                    <Settings className="h-4 w-4" />
+                    Edit Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="cursor-pointer gap-2 text-destructive focus:text-destructive"
+                    onClick={() => logout()}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          )}
+        </div>
       </div>
     </nav>
   );
