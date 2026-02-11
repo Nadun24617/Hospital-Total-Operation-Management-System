@@ -3,6 +3,19 @@ import PatientDashboardNavBar from '../components/PatientDashboardNavBar';
 import Footer from '../components/Footer';
 import { useAuth } from '../auth';
 import { useNavigate } from 'react-router-dom';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const navLinks = [
   { label: 'About Us', id: 'hospital' },
@@ -67,8 +80,8 @@ export interface StoredAppointment {
   specialization: string;
   department: string;
   hospital: string;
-  date: string; // YYYY-MM-DD
-  timeSlot: string; // HH:mm
+  date: string;
+  timeSlot: string;
   queueNumber: number;
   status: AppointmentStatus;
   createdAt: string;
@@ -97,7 +110,6 @@ const AppointmentBooking: React.FC = () => {
     [selectedDoctorId],
   );
 
-  // Initialise patient details from logged in user
   useEffect(() => {
     if (user) {
       const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ');
@@ -106,7 +118,6 @@ const AppointmentBooking: React.FC = () => {
     }
   }, [user]);
 
-  // Redirect unauthenticated users to login with info screen
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
@@ -114,18 +125,18 @@ const AppointmentBooking: React.FC = () => {
           <PatientDashboardNavBar navLinks={navLinks} />
         </div>
         <main className="max-w-3xl mx-auto mt-12 px-4">
-          <div className="bg-white rounded-3xl shadow p-8 flex flex-col items-center text-center gap-4">
+          <Card className="rounded-3xl shadow p-8 flex flex-col items-center text-center gap-4">
             <h1 className="text-2xl font-bold text-blue-800">Appointment Booking</h1>
             <p className="text-gray-600">
               Please log in to book an appointment and to auto-fill your patient details.
             </p>
-            <button
-              className="mt-2 px-6 py-2 rounded-full bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
+            <Button
+              className="mt-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6"
               onClick={() => navigate('/login')}
             >
               Go to Login
-            </button>
-          </div>
+            </Button>
+          </Card>
         </main>
         <Footer />
       </div>
@@ -181,13 +192,14 @@ const AppointmentBooking: React.FC = () => {
   };
 
   const stepBadge = (label: string, active: boolean, done: boolean) => (
-    <div
+    <Badge
+      variant={active ? 'default' : done ? 'secondary' : 'outline'}
       className={
-        'flex items-center gap-2 px-3 py-1 rounded-full text-xs md:text-sm ' +
+        'flex items-center gap-2 px-3 py-1 text-xs md:text-sm ' +
         (active
-          ? 'bg-blue-600 text-white shadow'
+          ? 'bg-blue-600 text-white shadow hover:bg-blue-600'
           : done
-          ? 'bg-blue-100 text-blue-700'
+          ? 'bg-blue-100 text-blue-700 hover:bg-blue-100'
           : 'bg-gray-100 text-gray-500')
       }
     >
@@ -200,7 +212,7 @@ const AppointmentBooking: React.FC = () => {
         {done ? '✓' : label.charAt(0)}
       </span>
       <span>{label}</span>
-    </div>
+    </Badge>
   );
 
   const renderStepHeader = () => (
@@ -214,7 +226,7 @@ const AppointmentBooking: React.FC = () => {
   );
 
   const renderDoctorSelection = () => (
-    <section className="bg-white rounded-3xl shadow p-6 md:p-8">
+    <Card className="rounded-3xl shadow p-6 md:p-8">
       {renderStepHeader()}
       <h1 className="text-2xl font-bold text-blue-800 mb-2">Choose a Doctor</h1>
       <p className="text-gray-600 mb-6 text-sm md:text-base">
@@ -222,10 +234,10 @@ const AppointmentBooking: React.FC = () => {
       </p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {doctors.map((doc) => (
-          <button
+          <Card
             key={doc.id}
             className={
-              'text-left bg-white rounded-2xl border shadow-sm hover:shadow-md transition p-4 flex flex-col gap-2 focus:outline-none focus:ring-2 focus:ring-blue-400 ' +
+              'text-left rounded-2xl hover:shadow-md transition p-4 flex flex-col gap-2 cursor-pointer ' +
               (selectedDoctorId === doc.id ? 'border-blue-400' : 'border-blue-100')
             }
             onClick={() => {
@@ -237,16 +249,16 @@ const AppointmentBooking: React.FC = () => {
             <div className="text-blue-500 text-sm">{doc.specialization}</div>
             <div className="text-gray-500 text-xs">{doc.department}</div>
             <div className="text-gray-500 text-xs mt-1 line-clamp-3">{doc.description}</div>
-          </button>
+          </Card>
         ))}
       </div>
-    </section>
+    </Card>
   );
 
   const renderDateTimeSelection = () => {
     if (!selectedDoctor) return null;
     return (
-      <section className="bg-white rounded-3xl shadow p-6 md:p-8">
+      <Card className="rounded-3xl shadow p-6 md:p-8">
         {renderStepHeader()}
         <div className="flex flex-col md:flex-row gap-6 mb-6">
           <div className="flex-1">
@@ -256,132 +268,132 @@ const AppointmentBooking: React.FC = () => {
             <p className="text-gray-600 text-sm">{selectedDoctor.description}</p>
             <p className="text-gray-500 text-xs mt-2">{selectedDoctor.hospital}</p>
           </div>
-          <div className="flex-1 bg-blue-50/60 rounded-2xl p-4 text-sm text-gray-600">
+          <Card className="flex-1 bg-blue-50/60 rounded-2xl p-4 text-sm text-gray-600 border-blue-100">
             <h3 className="font-semibold text-blue-700 mb-2">Appointment Info</h3>
             <ul className="list-disc pl-4 space-y-1">
               <li>Consultations are usually 15–20 minutes.</li>
               <li>Please arrive at least 15 minutes before your time slot.</li>
               <li>Bring previous reports, prescriptions and identity documents.</li>
             </ul>
-          </div>
+          </Card>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-blue-800 mb-2">Select Date</label>
-            <input
+          <div className="space-y-2">
+            <Label className="text-blue-800">Select Date</Label>
+            <Input
               type="date"
               min={minDate}
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full border border-blue-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-blue-800 mb-2">Select Time Slot</label>
+          <div className="space-y-2">
+            <Label className="text-blue-800">Select Time Slot</Label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {selectedDoctor.availableSlots.map((slot) => (
-                <button
+                <Button
                   key={slot}
                   type="button"
+                  variant={timeSlot === slot ? 'default' : 'outline'}
                   className={
-                    'px-3 py-2 rounded-lg text-sm border transition ' +
-                    (timeSlot === slot
-                      ? 'bg-blue-600 text-white border-blue-600 shadow'
-                      : 'bg-white text-gray-700 border-blue-200 hover:bg-blue-50')
+                    timeSlot === slot
+                      ? 'bg-blue-600 text-white hover:bg-blue-700 shadow'
+                      : 'border-blue-200 text-gray-700 hover:bg-blue-50'
                   }
                   onClick={() => setTimeSlot(slot)}
                 >
                   {slot}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
         </div>
 
         <div className="flex justify-between mt-8">
-          <button
-            className="px-4 py-2 rounded-full border border-blue-200 text-blue-600 bg-white hover:bg-blue-50 text-sm font-medium"
+          <Button
+            variant="outline"
+            className="rounded-full border-blue-200 text-blue-600 hover:bg-blue-50"
             onClick={() => setStep('selectDoctor')}
           >
             Back to doctors
-          </button>
-          <button
-            className="px-5 py-2 rounded-full bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          </Button>
+          <Button
+            className="rounded-full bg-blue-600 text-white hover:bg-blue-700 font-semibold px-5"
             disabled={!date || !timeSlot}
             onClick={() => setStep('detailsForm')}
           >
             Continue
-          </button>
+          </Button>
         </div>
-      </section>
+      </Card>
     );
   };
 
   const renderDetailsForm = () => (
-    <section className="bg-white rounded-3xl shadow p-6 md:p-8">
+    <Card className="rounded-3xl shadow p-6 md:p-8">
       {renderStepHeader()}
       <h2 className="text-2xl font-bold text-blue-800 mb-2">Appointment Details</h2>
       <p className="text-gray-600 text-sm mb-6">
         Your basic information is auto-filled from your profile. You can update it if needed.
       </p>
       <div className="grid md:grid-cols-2 gap-6 mb-6">
-        <div>
-          <label className="block text-sm font-medium text-blue-800 mb-1">Patient name</label>
-          <input
+        <div className="space-y-2">
+          <Label className="text-blue-800">Patient name</Label>
+          <Input
             type="text"
             value={patientName}
             onChange={(e) => setPatientName(e.target.value)}
-            className="w-full border border-blue-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-blue-800 mb-1">Contact number</label>
-          <input
+        <div className="space-y-2">
+          <Label className="text-blue-800">Contact number</Label>
+          <Input
             type="tel"
             value={contactNumber}
             onChange={(e) => setContactNumber(e.target.value)}
-            className="w-full border border-blue-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-blue-800 mb-1">Appointment type</label>
-          <select
-            value={appointmentType}
-            onChange={(e) => setAppointmentType(e.target.value)}
-            className="w-full border border-blue-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
-          >
-            <option value="Consultation">Consultation</option>
-            <option value="Follow-up">Follow-up</option>
-            <option value="Checkup">Routine checkup</option>
-          </select>
+        <div className="space-y-2">
+          <Label className="text-blue-800">Appointment type</Label>
+          <Select value={appointmentType} onValueChange={setAppointmentType}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Consultation">Consultation</SelectItem>
+              <SelectItem value="Follow-up">Follow-up</SelectItem>
+              <SelectItem value="Checkup">Routine checkup</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-blue-800 mb-1">Reason for visit (optional)</label>
-          <textarea
+        <div className="space-y-2">
+          <Label className="text-blue-800">Reason for visit (optional)</Label>
+          <Textarea
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            className="w-full border border-blue-200 rounded-lg px-3 py-2 text-sm h-24 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="h-24 resize-none"
             placeholder="Describe your symptoms or reason for visit"
           />
         </div>
       </div>
       <div className="flex justify-between mt-4">
-        <button
-          className="px-4 py-2 rounded-full border border-blue-200 text-blue-600 bg-white hover:bg-blue-50 text-sm font-medium"
+        <Button
+          variant="outline"
+          className="rounded-full border-blue-200 text-blue-600 hover:bg-blue-50"
           onClick={() => setStep('dateTime')}
         >
           Back
-        </button>
-        <button
-          className="px-5 py-2 rounded-full bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        </Button>
+        <Button
+          className="rounded-full bg-blue-600 text-white hover:bg-blue-700 font-semibold px-5"
           disabled={!patientName || !contactNumber || !appointmentType}
           onClick={() => setStep('confirm')}
         >
           Review & confirm
-        </button>
+        </Button>
       </div>
-    </section>
+    </Card>
   );
 
   const renderConfirm = () => {
@@ -391,7 +403,7 @@ const AppointmentBooking: React.FC = () => {
     const queuePreview = 'Will be assigned on confirm';
 
     return (
-      <section className="bg-white rounded-3xl shadow p-6 md:p-8">
+      <Card className="rounded-3xl shadow p-6 md:p-8">
         {renderStepHeader()}
         <h2 className="text-2xl font-bold text-blue-800 mb-4">Confirm Appointment</h2>
         <div className="grid md:grid-cols-2 gap-6 mb-6 text-sm">
@@ -425,34 +437,36 @@ const AppointmentBooking: React.FC = () => {
 
         <div className="flex flex-wrap gap-3 justify-between mt-4">
           <div className="flex gap-2">
-            <button
-              className="px-4 py-2 rounded-full border border-blue-200 text-blue-600 bg-white hover:bg-blue-50 text-sm font-medium"
+            <Button
+              variant="outline"
+              className="rounded-full border-blue-200 text-blue-600 hover:bg-blue-50"
               onClick={() => setStep('detailsForm')}
             >
               Edit details
-            </button>
-            <button
-              className="px-4 py-2 rounded-full border border-red-200 text-red-600 bg-white hover:bg-red-50 text-sm font-medium"
+            </Button>
+            <Button
+              variant="outline"
+              className="rounded-full border-red-200 text-red-600 hover:bg-red-50"
               onClick={() => navigate('/patient-dashboard')}
             >
               Cancel booking
-            </button>
+            </Button>
           </div>
-          <button
-            className="px-6 py-2 rounded-full bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700"
+          <Button
+            className="rounded-full bg-blue-600 text-white hover:bg-blue-700 font-semibold px-6"
             onClick={handleConfirm}
           >
             Confirm Appointment
-          </button>
+          </Button>
         </div>
-      </section>
+      </Card>
     );
   };
 
   const renderSuccess = () => {
     if (!createdAppointment) return null;
     return (
-      <section className="bg-white rounded-3xl shadow p-6 md:p-8 text-center">
+      <Card className="rounded-3xl shadow p-6 md:p-8 text-center">
         {renderStepHeader()}
         <div className="flex flex-col items-center gap-4">
           <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-3xl">
@@ -463,7 +477,7 @@ const AppointmentBooking: React.FC = () => {
             Your appointment has been successfully booked. Please arrive at the hospital at least 15 minutes before your selected time.
           </p>
           <div className="mt-4 grid md:grid-cols-2 gap-4 text-sm text-left w-full max-w-xl">
-            <div className="bg-blue-50 rounded-2xl p-4">
+            <Card className="bg-blue-50 rounded-2xl p-4 border-blue-100">
               <h3 className="font-semibold text-blue-700 mb-1">Appointment</h3>
               <p className="text-gray-700">ID: {createdAppointment.id}</p>
               <p className="text-gray-700">
@@ -471,39 +485,41 @@ const AppointmentBooking: React.FC = () => {
               </p>
               <p className="text-gray-700">Doctor: {createdAppointment.doctorName}</p>
               <p className="text-gray-700">Queue number: {createdAppointment.queueNumber}</p>
-            </div>
-            <div className="bg-blue-50 rounded-2xl p-4">
+            </Card>
+            <Card className="bg-blue-50 rounded-2xl p-4 border-blue-100">
               <h3 className="font-semibold text-blue-700 mb-1">Instructions</h3>
               <ul className="list-disc pl-4 space-y-1 text-gray-700">
                 <li>Arrive 15 minutes before your scheduled time.</li>
                 <li>Bring your previous prescriptions and reports if available.</li>
                 <li>Carry a valid identity document.</li>
               </ul>
-            </div>
+            </Card>
           </div>
 
           <div className="flex flex-wrap gap-3 justify-center mt-6">
-            <button
-              className="px-5 py-2 rounded-full bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700"
+            <Button
+              className="rounded-full bg-blue-600 text-white hover:bg-blue-700 font-semibold px-5"
               onClick={() => navigate('/my-appointments')}
             >
               View appointment
-            </button>
-            <button
-              className="px-5 py-2 rounded-full border border-blue-200 text-blue-600 bg-white hover:bg-blue-50 text-sm font-semibold"
+            </Button>
+            <Button
+              variant="outline"
+              className="rounded-full border-blue-200 text-blue-600 hover:bg-blue-50 font-semibold px-5"
               onClick={() => window.alert('Download as PDF can be implemented here.')}
             >
               Download confirmation (PDF)
-            </button>
-            <button
-              className="px-5 py-2 rounded-full border border-green-200 text-green-700 bg-white hover:bg-green-50 text-sm font-semibold"
+            </Button>
+            <Button
+              variant="outline"
+              className="rounded-full border-green-200 text-green-700 hover:bg-green-50 font-semibold px-5"
               onClick={resetForAnother}
             >
               Book another appointment
-            </button>
+            </Button>
           </div>
         </div>
-      </section>
+      </Card>
     );
   };
 
