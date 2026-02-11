@@ -207,7 +207,7 @@ const AppointmentBooking: React.FC = () => {
       <span
         className={
           'w-5 h-5 flex items-center justify-center rounded-full border text-[10px] ' +
-          (active || done ? 'border-white bg-white text-primary' : 'border-gray-300 text-muted-foreground')
+          (active || done ? 'border-white bg-white text-primary' : 'border-border text-muted-foreground')
         }
       >
         {done ? <Check className="h-3 w-3" /> : label.charAt(0)}
@@ -300,7 +300,7 @@ const AppointmentBooking: React.FC = () => {
                   className={
                     timeSlot === slot
                       ? 'bg-primary text-white hover:bg-primary/90'
-                      : 'border-border text-gray-700 hover:bg-accent'
+                      : 'border-border text-muted-foreground hover:bg-accent'
                   }
                   onClick={() => setTimeSlot(slot)}
                 >
@@ -410,16 +410,16 @@ const AppointmentBooking: React.FC = () => {
         <div className="grid md:grid-cols-2 gap-6 mb-6 text-sm">
           <div className="space-y-2">
             <h3 className="font-semibold text-foreground mb-1">Doctor</h3>
-            <p className="text-gray-700">{selectedDoctor.name}</p>
+            <p className="text-muted-foreground">{selectedDoctor.name}</p>
             <p className="text-primary">{selectedDoctor.specialization}</p>
             <p className="text-muted-foreground">{selectedDoctor.department}</p>
             <p className="text-muted-foreground text-xs mt-1">{selectedDoctor.hospital}</p>
           </div>
           <div className="space-y-2">
             <h3 className="font-semibold text-foreground mb-1">Appointment</h3>
-            <p className="text-gray-700">Date: {displayDate}</p>
-            <p className="text-gray-700">Time: {displayTime}</p>
-            <p className="text-gray-700">Type: {appointmentType}</p>
+            <p className="text-muted-foreground">Date: {displayDate}</p>
+            <p className="text-muted-foreground">Time: {displayTime}</p>
+            <p className="text-muted-foreground">Type: {appointmentType}</p>
             <p className="text-muted-foreground text-xs">Queue number: {queuePreview}</p>
           </div>
         </div>
@@ -427,8 +427,8 @@ const AppointmentBooking: React.FC = () => {
         <div className="grid md:grid-cols-2 gap-6 mb-6 text-sm">
           <div className="space-y-2">
             <h3 className="font-semibold text-foreground mb-1">Patient</h3>
-            <p className="text-gray-700">{patientName}</p>
-            <p className="text-gray-700">{contactNumber}</p>
+            <p className="text-muted-foreground">{patientName}</p>
+            <p className="text-muted-foreground">{contactNumber}</p>
           </div>
           <div className="space-y-2">
             <h3 className="font-semibold text-foreground mb-1">Reason</h3>
@@ -480,16 +480,16 @@ const AppointmentBooking: React.FC = () => {
           <div className="mt-4 grid md:grid-cols-2 gap-4 text-sm text-left w-full max-w-xl">
             <Card className="bg-muted p-4">
               <h3 className="font-semibold text-foreground mb-1">Appointment</h3>
-              <p className="text-gray-700">ID: {createdAppointment.id}</p>
-              <p className="text-gray-700">
+              <p className="text-muted-foreground">ID: {createdAppointment.id}</p>
+              <p className="text-muted-foreground">
                 Date & time: {createdAppointment.date} at {createdAppointment.timeSlot}
               </p>
-              <p className="text-gray-700">Doctor: {createdAppointment.doctorName}</p>
-              <p className="text-gray-700">Queue number: {createdAppointment.queueNumber}</p>
+              <p className="text-muted-foreground">Doctor: {createdAppointment.doctorName}</p>
+              <p className="text-muted-foreground">Queue number: {createdAppointment.queueNumber}</p>
             </Card>
             <Card className="bg-muted p-4">
               <h3 className="font-semibold text-foreground mb-1">Instructions</h3>
-              <ul className="list-disc pl-4 space-y-1 text-gray-700">
+              <ul className="list-disc pl-4 space-y-1 text-muted-foreground">
                 <li>Arrive 15 minutes before your scheduled time.</li>
                 <li>Bring your previous prescriptions and reports if available.</li>
                 <li>Carry a valid identity document.</li>

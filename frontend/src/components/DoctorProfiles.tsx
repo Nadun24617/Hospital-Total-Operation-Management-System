@@ -167,10 +167,10 @@ export default function DoctorProfiles() {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Doctor Profiles</h2>
           <div className="flex gap-2">
-            <Button variant="link" size="sm" className="text-primary-700" onClick={() => void fetchDoctors()}>
+            <Button variant="link" size="sm" className="text-primary" onClick={() => void fetchDoctors()}>
               Refresh
             </Button>
-            <Button variant="link" size="sm" className="text-primary-700" onClick={startCreate}>
+            <Button variant="link" size="sm" className="text-primary" onClick={startCreate}>
               New Doctor
             </Button>
           </div>
@@ -226,7 +226,7 @@ export default function DoctorProfiles() {
                       {doctor.joinedDate ? doctor.joinedDate.substring(0, 10) : '-'}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="link" size="sm" className="text-primary-700" onClick={() => startEdit(doctor)}>
+                      <Button variant="link" size="sm" className="text-primary" onClick={() => startEdit(doctor)}>
                         Edit
                       </Button>
                     </TableCell>
