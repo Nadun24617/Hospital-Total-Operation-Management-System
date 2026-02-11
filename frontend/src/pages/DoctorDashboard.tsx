@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { LayoutDashboard, Clock, Users, CalendarDays, History, User, ChevronLeft, ChevronRight, LogOut } from 'lucide-react';
 
 interface StatCardProps {
   label: string;
@@ -68,24 +69,12 @@ export default function DoctorDashboard() {
   ];
 
   const navItems = [
-    { id: 'dashboard' as const, label: 'Dashboard', icon: (
-      <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-muted text-foreground text-sm font-semibold">D</span>
-    ) },
-    { id: 'appointments' as const, label: 'Appointments', icon: (
-      <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-muted text-foreground text-sm font-semibold">A</span>
-    ) },
-    { id: 'patients' as const, label: 'Patient List', icon: (
-      <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-muted text-foreground text-sm font-semibold">P</span>
-    ) },
-    { id: 'schedule' as const, label: 'Schedule / Availability', icon: (
-      <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-muted text-foreground text-sm font-semibold">S</span>
-    ) },
-    { id: 'history' as const, label: 'Consultation History', icon: (
-      <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-muted text-foreground text-sm font-semibold">H</span>
-    ) },
-    { id: 'profile' as const, label: 'Profile', icon: (
-      <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-muted text-foreground text-sm font-semibold">Pr</span>
-    ) },
+    { id: 'dashboard' as const, label: 'Dashboard', icon: <LayoutDashboard className="h-5 w-5" /> },
+    { id: 'appointments' as const, label: 'Appointments', icon: <Clock className="h-5 w-5" /> },
+    { id: 'patients' as const, label: 'Patient List', icon: <Users className="h-5 w-5" /> },
+    { id: 'schedule' as const, label: 'Schedule / Availability', icon: <CalendarDays className="h-5 w-5" /> },
+    { id: 'history' as const, label: 'Consultation History', icon: <History className="h-5 w-5" /> },
+    { id: 'profile' as const, label: 'Profile', icon: <User className="h-5 w-5" /> },
   ];
 
   const handleLogout = () => {
@@ -120,7 +109,7 @@ export default function DoctorDashboard() {
             onClick={() => setCollapsed(prev => !prev)}
             aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}
           >
-            <span className="text-xs">{collapsed ? '»' : '«'}</span>
+            {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </Button>
         </div>
 
@@ -152,7 +141,7 @@ export default function DoctorDashboard() {
             className="w-full bg-red-50 text-destructive hover:bg-red-100"
             onClick={handleLogout}
           >
-            <span className="text-base mr-2">⎋</span>
+            <LogOut className="h-4 w-4 mr-2" />
             {!collapsed && <span>Logout</span>}
           </Button>
         </div>
