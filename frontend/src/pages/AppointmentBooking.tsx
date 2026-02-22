@@ -272,7 +272,9 @@ const AppointmentBooking: React.FC = () => {
       {stepBadge('Confirm', step === 'confirm', step === 'success')}
       {stepBadge('Success', step === 'success', step === 'success')}
     </div>
+    
   );
+  
 
   const renderDoctorSelection = () => (
     <Card className="p-6 md:p-8">
@@ -317,6 +319,16 @@ const AppointmentBooking: React.FC = () => {
             </Card>
           ))
         )}
+      </div>
+      {/* Move button to bottom right for user-friendly access */}
+      <div className="flex justify-end mt-6">
+        <Button
+          variant="outline"
+          className="border-primary text-primary hover:bg-accent font-semibold px-5"
+          onClick={() => navigate('/my-appointments')}
+        >
+          Go to My Appointments
+        </Button>
       </div>
     </Card>
   );
@@ -587,6 +599,7 @@ const AppointmentBooking: React.FC = () => {
             >
               Book another appointment
             </Button>
+            
           </div>
         </div>
       </Card>

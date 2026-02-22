@@ -4,6 +4,7 @@ import argon2 from 'argon2';
 import { PrismaService } from '../prisma/prisma.service';
 import type { CreateUserDto } from './dto/create-user.dto';
 import type { CreateStaffDto } from './dto/create-staff.dto';
+import type { UpdateMyProfileDto } from './dto/update-my-profile.dto';
 import type { User } from '@prisma/client';
 import { UserRole, UserStatus } from '@prisma/client';
 
@@ -32,6 +33,35 @@ export class UserService {
 
   async findByEmail(email: string): Promise<User | null> {
     return this.prisma.user.findUnique({ where: { email } });
+  }
+
+  async getMe(userId: string): Promise<Omit<User, 'passwordHash'>> {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return this.sanitize(user);
+  }
+
+  async updateMe(userId: string, dto: UpdateMyProfileDto): Promise<Omit<User, 'passwordHash'>> {
+    const existing = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!existing) {
+      throw new NotFoundException('User not found');
+    }
+
+    await this.ensureUniqueContact(dto.email, dto.phone, userId);
+
+    const updated = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        firstName: dto.firstName,
+        lastName: dto.lastName,
+        email: dto.email,
+        phone: dto.phone,
+      },
+    });
+
+    return this.sanitize(updated);
   }
 
   async createStaff(dto: CreateStaffDto): Promise<User> {

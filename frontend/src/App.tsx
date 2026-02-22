@@ -9,6 +9,8 @@ import AppointmentBooking from './pages/AppointmentBooking';
 import MyAppointments from './pages/MyAppointments';
 import DoctorDashboard from './pages/DoctorDashboard';
 import Dashboard from './pages/Dashboard';
+import ProfileView from './pages/ProfileView';
+import ProfileEdit from './pages/ProfileEdit';
 
 import { Routes, Route } from 'react-router-dom';
 
@@ -23,6 +25,8 @@ export default function App() {
         <Route path="/about" element={<AboutHospital />} />
         <Route path="/appointments" element={<AppointmentBooking />} />
         <Route path="/my-appointments" element={<MyAppointments />} />
+        <Route path="/profile" element={<ProfileView />} />
+        <Route path="/profile/edit" element={<ProfileEdit />} />
         <Route path="/doctors" element={<AboutDoctors />} />
         <Route path="/login" element={<Login />} />
       </Routes>

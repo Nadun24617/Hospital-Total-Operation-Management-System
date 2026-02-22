@@ -17,6 +17,7 @@ interface AuthContextType {
   token: string | null;
   user: AuthUser | null;
   login: (token: string, user: AuthUser) => void;
+  updateUser: (user: AuthUser) => void;
   logout: () => void;
 }
 
@@ -50,6 +51,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoggedIn(true);
   };
 
+  const updateUser = (userData: AuthUser) => {
+    setUser(userData);
+  };
+
   const logout = () => {
     setToken(null);
     setUser(null);
@@ -60,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, token, user, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, token, user, login, updateUser, logout }}>
       {children}
     </AuthContext.Provider>
   );

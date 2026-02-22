@@ -55,7 +55,7 @@ const PatientDashboardNavBar: React.FC<PatientDashboardNavBarProps> = ({ navLink
     } else if (id === 'hospital') {
       if (location.pathname !== '/about') navigate('/about');
     } else if (id === 'appointments') {
-      if (location.pathname !== '/appointments') navigate('/appointments');
+      if (location.pathname !== '/appointments') navigate('/my-appointments');
     } else if (id === 'doctors') {
       if (location.pathname !== '/doctors') navigate('/doctors');
     }
@@ -163,7 +163,7 @@ const PatientDashboardNavBar: React.FC<PatientDashboardNavBarProps> = ({ navLink
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     className="cursor-pointer gap-2 text-foreground"
-                    onClick={() => alert('Edit profile (implement as needed)')}
+                    onClick={() => navigate('/profile/edit')}
                   >
                     <Settings className="h-4 w-4" />
                     Edit Profile
