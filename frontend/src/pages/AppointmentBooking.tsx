@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Check } from 'lucide-react';
+
 import {
   Select,
   SelectContent,
@@ -35,18 +36,11 @@ interface ApiDoctor {
   phone?: string | null;
   email?: string | null;
   description?: string | null;
-  joinedDate?: string | null;
 }
-
-const DEFAULT_TIME_SLOTS = ['09:00', '09:30', '10:00', '10:30', '11:00', '14:00', '14:30', '15:00'];
-const DEFAULT_HOSPITAL_LABEL = 'ABC Hospital';
-
-export type AppointmentStatus = 'UPCOMING' | 'COMPLETED' | 'CANCELLED';
 
 interface ApiAppointment {
   id: number;
   doctorId: number;
-  userId?: string | null;
   patientName: string;
   contactNumber: string;
   reason?: string | null;
@@ -54,12 +48,12 @@ interface ApiAppointment {
   date: string;
   timeSlot: string;
   queueNumber: number;
-  status: AppointmentStatus;
+  status: 'UPCOMING' | 'COMPLETED' | 'CANCELLED';
   createdAt: string;
   doctor?: { fullName: string; specializationId: number };
 }
 
-export interface AppointmentView {
+interface AppointmentView {
   id: number;
   patientName: string;
   contactNumber: string;
@@ -73,11 +67,24 @@ export interface AppointmentView {
   date: string;
   timeSlot: string;
   queueNumber: number;
-  status: AppointmentStatus;
+  status: string;
   createdAt: string;
 }
 
 type Step = 'selectDoctor' | 'dateTime' | 'detailsForm' | 'confirm' | 'success';
+
+const DEFAULT_TIME_SLOTS = [
+  '09:00',
+  '09:30',
+  '10:00',
+  '10:30',
+  '11:00',
+  '14:00',
+  '14:30',
+  '15:00',
+];
+
+const DEFAULT_HOSPITAL_LABEL = 'ABC Hospital';
 
 const AppointmentBooking: React.FC = () => {
   const { isLoggedIn, user, token } = useAuth();
@@ -85,13 +92,11 @@ const AppointmentBooking: React.FC = () => {
 
   const authHeaders = useMemo(
     () => (token ? { Authorization: `Bearer ${token}` } : undefined),
-    [token],
+    [token]
   );
 
   const [step, setStep] = useState<Step>('selectDoctor');
   const [doctors, setDoctors] = useState<ApiDoctor[]>([]);
-  const [doctorsLoading, setDoctorsLoading] = useState(false);
-  const [doctorsError, setDoctorsError] = useState('');
   const [selectedDoctorId, setSelectedDoctorId] = useState<number | null>(null);
   const [date, setDate] = useState('');
   const [timeSlot, setTimeSlot] = useState('');
@@ -99,74 +104,47 @@ const AppointmentBooking: React.FC = () => {
   const [contactNumber, setContactNumber] = useState('');
   const [reason, setReason] = useState('');
   const [appointmentType, setAppointmentType] = useState('Consultation');
-  const [createdAppointment, setCreatedAppointment] = useState<AppointmentView | null>(null);
+
+  const [createdAppointment, setCreatedAppointment] =
+    useState<AppointmentView | null>(null);
+
   const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState('');
 
-  const selectedDoctor = useMemo(
-    () => doctors.find((d) => d.id === selectedDoctorId) || null,
-    [doctors, selectedDoctorId],
-  );
-
   const specializationName = useMemo(() => {
     const map = new Map(SPECIALIZATIONS.map((s) => [s.id, s.name] as const));
-    return (id: number) => map.get(id) || (id ? `#${id}` : 'Not specified');
+    return (id: number) => map.get(id) || `#${id}`;
   }, []);
 
-  useEffect(() => {
-    if (!isLoggedIn) return;
-    setDoctorsLoading(true);
-    setDoctorsError('');
-
-    void (async () => {
-      try {
-        const response = await axios.get<ApiDoctor[]>(
-          `${import.meta.env.VITE_API_URL}/doctors/confirmed`,
-          { headers: authHeaders },
-        );
-        setDoctors(response.data);
-      } catch (err) {
-        if (axios.isAxiosError(err)) {
-          setDoctorsError(err.response?.data?.message ?? 'Failed to load doctors.');
-        } else {
-          setDoctorsError('Failed to load doctors.');
-        }
-      } finally {
-        setDoctorsLoading(false);
-      }
-    })();
-  }, [isLoggedIn, authHeaders]);
+  const selectedDoctor = useMemo(
+    () => doctors.find((d) => d.id === selectedDoctorId) || null,
+    [doctors, selectedDoctorId]
+  );
 
   useEffect(() => {
     if (user) {
       const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ');
-      setPatientName((prev) => (prev ? prev : fullName));
-      setContactNumber((prev) => (prev ? prev : user.phone));
+      setPatientName((prev) => prev || fullName);
+      setContactNumber((prev) => prev || user.phone);
     }
   }, [user]);
 
-  if (!isLoggedIn) {
-    return (
-      <div className="min-h-screen flex flex-col bg-muted">
-        <PatientDashboardNavBar navLinks={navLinks} />
-        <main className="flex-1 max-w-3xl mx-auto mt-12 px-4">
-          <Card className="p-8 flex flex-col items-center text-center gap-4">
-            <h1 className="text-2xl font-bold text-foreground">Appointment Booking</h1>
-            <p className="text-muted-foreground">
-              Please log in to book an appointment and to auto-fill your patient details.
-            </p>
-            <Button
-              className="mt-2 bg-primary hover:bg-primary/90 text-white font-semibold px-6"
-              onClick={() => navigate('/login')}
-            >
-              Go to Login
-            </Button>
-          </Card>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (!isLoggedIn) return;
+
+    void (async () => {
+      try {
+        const res = await axios.get<ApiDoctor[]>(
+          `${import.meta.env.VITE_API_URL}/doctors/confirmed`,
+          { headers: authHeaders }
+        );
+
+        setDoctors(res.data);
+      } catch {
+        console.error('Failed to load doctors');
+      }
+    })();
+  }, [isLoggedIn, authHeaders]);
 
   const minDate = useMemo(() => {
     const today = new Date();
@@ -174,7 +152,7 @@ const AppointmentBooking: React.FC = () => {
   }, []);
 
   const handleConfirm = () => {
-    if (!selectedDoctor || !date || !timeSlot || !patientName || !contactNumber || !appointmentType) return;
+    if (!selectedDoctor || !date || !timeSlot) return;
     if (createLoading) return;
 
     setCreateError('');
@@ -193,12 +171,10 @@ const AppointmentBooking: React.FC = () => {
             date,
             timeSlot,
           },
-          { headers: authHeaders },
+          { headers: authHeaders }
         );
 
         const api = response.data;
-        const doctorName = api.doctor?.fullName ?? selectedDoctor.fullName;
-        const specialization = specializationName(api.doctor?.specializationId ?? selectedDoctor.specializationId);
 
         setCreatedAppointment({
           id: api.id,
@@ -207,28 +183,274 @@ const AppointmentBooking: React.FC = () => {
           reason: api.reason ?? '',
           appointmentType: api.appointmentType,
           doctorId: api.doctorId,
-          doctorName,
-          specialization,
-          department: specialization,
+          doctorName: api.doctor?.fullName ?? selectedDoctor.fullName,
+          specialization: specializationName(
+            api.doctor?.specializationId ?? selectedDoctor.specializationId
+          ),
+          department: specializationName(
+            api.doctor?.specializationId ?? selectedDoctor.specializationId
+          ),
           hospital: DEFAULT_HOSPITAL_LABEL,
-          date: (api.date ?? date).slice(0, 10),
+          date: api.date.slice(0, 10),
           timeSlot: api.timeSlot,
           queueNumber: api.queueNumber,
           status: api.status,
           createdAt: api.createdAt,
         });
+
         setStep('success');
-      } catch (err) {
-        if (axios.isAxiosError(err)) {
-          setCreateError(err.response?.data?.message ?? 'Failed to create appointment.');
-        } else {
-          setCreateError('Failed to create appointment.');
-        }
+      } catch {
+        setCreateError('Failed to create appointment');
       } finally {
         setCreateLoading(false);
       }
     })();
   };
+
+  const renderStepHeader = () => (
+    <div className="flex flex-wrap gap-3 mb-8 p-3 bg-white rounded-2xl shadow-sm">
+      {['Doctor', 'Date & Time', 'Details', 'Confirm', 'Success'].map(
+        (label, index) => {
+          const steps: Step[] = [
+            'selectDoctor',
+            'dateTime',
+            'detailsForm',
+            'confirm',
+            'success',
+          ];
+
+          const active = step === steps[index];
+          const done = steps.indexOf(step) > index;
+
+          return (
+            <Badge
+              key={label}
+              className={`px-4 py-2 rounded-xl transition ${
+                active
+                  ? 'bg-primary text-white'
+                  : done
+                  ? 'bg-green-100 text-green-700'
+                  : 'bg-gray-100 text-gray-500'
+              }`}
+            >
+              {label}
+            </Badge>
+          );
+        }
+      )}
+    </div>
+  );
+
+  const renderDoctorSelection = () => (
+    <Card className="p-8 rounded-3xl shadow-lg bg-white">
+      {renderStepHeader()}
+
+      <h1 className="text-3xl font-bold mb-2 text-gray-800">
+        Choose Your Doctor
+      </h1>
+
+      <div className="grid md:grid-cols-3 gap-6 mt-6">
+        {doctors.map((doc) => (
+          <Card
+            key={doc.id}
+            onClick={() => {
+              setSelectedDoctorId(doc.id);
+              setStep('dateTime');
+            }}
+            className={`p-5 rounded-2xl cursor-pointer transition hover:shadow-xl hover:-translate-y-1 ${
+              selectedDoctorId === doc.id
+                ? 'border-2 border-primary'
+                : 'border'
+            }`}
+          >
+            <h3 className="font-semibold text-lg">{doc.fullName}</h3>
+
+            <p className="text-primary text-sm mt-1">
+              {specializationName(doc.specializationId)}
+            </p>
+
+            <p className="text-gray-500 text-sm mt-3 line-clamp-3">
+              {doc.description || 'No description available'}
+            </p>
+          </Card>
+        ))}
+      </div>
+    </Card>
+  );
+
+  const renderDateTimeSelection = () => (
+    <Card className="p-8 rounded-3xl shadow-lg">
+      {renderStepHeader()}
+
+      <div className="grid md:grid-cols-2 gap-6">
+        <div>
+          <Label>Select Date</Label>
+          <Input
+            type="date"
+            min={minDate}
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <Label>Select Time Slot</Label>
+
+          <div className="grid grid-cols-3 gap-3 mt-2">
+            {DEFAULT_TIME_SLOTS.map((slot) => (
+              <Button
+                key={slot}
+                variant={timeSlot === slot ? 'default' : 'outline'}
+                onClick={() => setTimeSlot(slot)}
+              >
+                {slot}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-between mt-8">
+        <Button variant="outline" onClick={() => setStep('selectDoctor')}>
+          Back
+        </Button>
+
+        <Button
+          disabled={!date || !timeSlot}
+          onClick={() => setStep('detailsForm')}
+        >
+          Continue
+        </Button>
+      </div>
+    </Card>
+  );
+
+  const renderDetailsForm = () => (
+    <Card className="p-8 rounded-3xl shadow-lg">
+      {renderStepHeader()}
+
+      <div className="grid md:grid-cols-2 gap-6">
+        <div>
+          <Label>Patient Name</Label>
+          <Input
+            value={patientName}
+            onChange={(e) => setPatientName(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <Label>Contact Number</Label>
+          <Input
+            value={contactNumber}
+            onChange={(e) => setContactNumber(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <Label>Appointment Type</Label>
+
+          <Select value={appointmentType} onValueChange={setAppointmentType}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+
+            <SelectContent>
+              <SelectItem value="Consultation">Consultation</SelectItem>
+              <SelectItem value="Follow-up">Follow-up</SelectItem>
+              <SelectItem value="Checkup">Routine Checkup</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <Label>Reason (Optional)</Label>
+          <Textarea
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className="flex justify-between mt-6">
+        <Button variant="outline" onClick={() => setStep('dateTime')}>
+          Back
+        </Button>
+
+        <Button
+          disabled={!patientName || !contactNumber}
+          onClick={() => setStep('confirm')}
+        >
+          Review
+        </Button>
+      </div>
+    </Card>
+  );
+
+  const renderConfirm = () => (
+    <Card className="p-8 rounded-3xl shadow-lg text-sm">
+      {renderStepHeader()}
+
+      <h2 className="text-2xl font-bold mb-6">Confirm Appointment</h2>
+
+      {createError && (
+        <Card className="p-4 bg-red-50 text-red-600 mb-4">
+          {createError}
+        </Card>
+      )}
+
+      <div className="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 className="font-semibold">Doctor</h3>
+          <p>{selectedDoctor?.fullName}</p>
+          <p className="text-primary">
+            {specializationName(selectedDoctor?.specializationId || 0)}
+          </p>
+        </div>
+
+        <div>
+          <h3 className="font-semibold">Appointment</h3>
+          <p>Date: {date}</p>
+          <p>Time: {timeSlot}</p>
+          <p>Type: {appointmentType}</p>
+        </div>
+      </div>
+
+      <div className="flex justify-between mt-8">
+        <Button variant="outline" onClick={() => setStep('detailsForm')}>
+          Edit
+        </Button>
+
+        <Button
+          onClick={handleConfirm}
+          disabled={createLoading}
+        >
+          {createLoading ? 'Booking...' : 'Confirm Appointment'}
+        </Button>
+      </div>
+    </Card>
+  );
+
+  const renderSuccess = () => (
+    <Card className="p-12 text-center rounded-3xl shadow-xl bg-white">
+      <div className="flex flex-col items-center gap-6">
+        <div className="w-20 h-20 rounded-2xl bg-green-50 flex items-center justify-center">
+          <Check className="w-10 h-10 text-green-600" />
+        </div>
+
+        <h2 className="text-3xl font-bold">Booking Successful</h2>
+
+        <div className="flex gap-4 flex-wrap justify-center mt-6">
+          <Button onClick={() => navigate('/my-appointments')}>
+            View Appointment
+          </Button>
+
+          <Button variant="outline" onClick={resetForAnother}>
+            Book Another
+          </Button>
+        </div>
+      </div>
+    </Card>
+  );
 
   const resetForAnother = () => {
     setStep('selectDoctor');
@@ -237,385 +459,47 @@ const AppointmentBooking: React.FC = () => {
     setTimeSlot('');
     setReason('');
     setAppointmentType('Consultation');
-    setCreateError('');
   };
 
-  const stepBadge = (label: string, active: boolean, done: boolean) => (
-    <Badge
-      variant={active ? 'default' : done ? 'secondary' : 'outline'}
-      className={
-        'flex items-center gap-2 px-3 py-1 text-xs md:text-sm ' +
-        (active
-          ? 'bg-primary text-primary-foreground hover:bg-primary'
-          : done
-          ? 'bg-accent text-foreground hover:bg-accent'
-          : 'bg-muted text-muted-foreground')
-      }
-    >
-      <span
-        className={
-          'w-5 h-5 flex items-center justify-center rounded-full border text-[10px] ' +
-          (active || done ? 'border-white bg-white text-primary' : 'border-border text-muted-foreground')
-        }
-      >
-        {done ? <Check className="h-3 w-3" /> : label.charAt(0)}
-      </span>
-      <span>{label}</span>
-    </Badge>
-  );
-
-  const renderStepHeader = () => (
-    <div className="flex flex-wrap gap-2 mb-6">
-      {stepBadge('Doctor', step === 'selectDoctor', step !== 'selectDoctor')}
-      {stepBadge('Date & Time', step === 'dateTime', step === 'detailsForm' || step === 'confirm' || step === 'success')}
-      {stepBadge('Details', step === 'detailsForm', step === 'confirm' || step === 'success')}
-      {stepBadge('Confirm', step === 'confirm', step === 'success')}
-      {stepBadge('Success', step === 'success', step === 'success')}
-    </div>
-    
-  );
-  
-
-  const renderDoctorSelection = () => (
-    <Card className="p-6 md:p-8">
-      {renderStepHeader()}
-      <h1 className="text-2xl font-bold text-foreground mb-2">Choose a Doctor</h1>
-      <p className="text-muted-foreground mb-6 text-sm md:text-base">
-        Select a doctor for your appointment. You can view their specialization and department before proceeding.
-      </p>
-      {doctorsError && (
-        <Card className="p-4 mb-5 border-red-200 bg-red-50 text-red-700 text-sm">
-          {doctorsError}
-        </Card>
-      )}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {doctorsLoading ? (
-          <Card className="p-5 text-sm text-muted-foreground md:col-span-3">
-            Loading doctors...
-          </Card>
-        ) : doctors.length === 0 ? (
-          <Card className="p-5 text-sm text-muted-foreground md:col-span-3">
-            No confirmed doctors available right now.
-          </Card>
-        ) : (
-          doctors.map((doc) => (
-            <Card
-              key={doc.id}
-              className={
-                'text-left hover:border-primary/40 transition p-4 flex flex-col gap-2 cursor-pointer ' +
-                (selectedDoctorId === doc.id ? 'border-primary' : 'border-border')
-              }
-              onClick={() => {
-                setSelectedDoctorId(doc.id);
-                setStep('dateTime');
-              }}
-            >
-              <div className="font-semibold text-foreground">{doc.fullName}</div>
-              <div className="text-primary text-sm">{specializationName(doc.specializationId)}</div>
-              <div className="text-muted-foreground text-xs">{specializationName(doc.specializationId)}</div>
-              <div className="text-muted-foreground text-xs mt-1 line-clamp-3">
-                {doc.description || 'No description provided.'}
-              </div>
-            </Card>
-          ))
-        )}
-      </div>
-      {/* Move button to bottom right for user-friendly access */}
-      <div className="flex justify-end mt-6">
-        <Button
-          variant="outline"
-          className="border-primary text-primary hover:bg-accent font-semibold px-5"
-          onClick={() => navigate('/my-appointments')}
-        >
-          Go to My Appointments
-        </Button>
-      </div>
-    </Card>
-  );
-
-  const renderDateTimeSelection = () => {
-    if (!selectedDoctor) return null;
+  if (!isLoggedIn) {
     return (
-      <Card className="p-6 md:p-8">
-        {renderStepHeader()}
-        <div className="flex flex-col md:flex-row gap-6 mb-6">
-          <div className="flex-1">
-            <h2 className="text-xl font-bold text-foreground mb-1">{selectedDoctor.fullName}</h2>
-            <div className="text-primary text-sm mb-1">{specializationName(selectedDoctor.specializationId)}</div>
-            <div className="text-muted-foreground text-sm mb-2">{specializationName(selectedDoctor.specializationId)}</div>
-            <p className="text-muted-foreground text-sm">{selectedDoctor.description || 'No description provided.'}</p>
-            <p className="text-muted-foreground text-xs mt-2">{DEFAULT_HOSPITAL_LABEL}</p>
-          </div>
-          <Card className="flex-1 bg-muted p-4 text-sm text-muted-foreground border-border">
-            <h3 className="font-semibold text-foreground mb-2">Appointment Info</h3>
-            <ul className="list-disc pl-4 space-y-1">
-              <li>Consultations are usually 15–20 minutes.</li>
-              <li>Please arrive at least 15 minutes before your time slot.</li>
-              <li>Bring previous reports, prescriptions and identity documents.</li>
-            </ul>
+      <div className="min-h-screen flex flex-col bg-muted">
+        <PatientDashboardNavBar navLinks={navLinks} />
+
+        <main className="flex-1 max-w-3xl mx-auto mt-12 px-4">
+          <Card className="p-8 text-center rounded-3xl shadow-lg">
+            <h1 className="text-2xl font-bold">Appointment Booking</h1>
+
+            <p className="text-gray-500 mt-3">
+              Please login to book appointments.
+            </p>
+
+            <Button
+              className="mt-6"
+              onClick={() => navigate('/login')}
+            >
+              Go to Login
+            </Button>
           </Card>
-        </div>
+        </main>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label className="text-foreground">Select Date</Label>
-            <Input
-              type="date"
-              min={minDate}
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-foreground">Select Time Slot</Label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {DEFAULT_TIME_SLOTS.map((slot) => (
-                <Button
-                  key={slot}
-                  type="button"
-                  variant={timeSlot === slot ? 'default' : 'outline'}
-                  className={
-                    timeSlot === slot
-                      ? 'bg-primary text-white hover:bg-primary/90'
-                      : 'border-border text-muted-foreground hover:bg-accent'
-                  }
-                  onClick={() => setTimeSlot(slot)}
-                >
-                  {slot}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="flex justify-between mt-8">
-          <Button
-            variant="outline"
-            className="border-border text-primary hover:bg-accent"
-            onClick={() => setStep('selectDoctor')}
-          >
-            Back to doctors
-          </Button>
-          <Button
-            className="bg-primary text-white hover:bg-primary/90 font-semibold px-5"
-            disabled={!date || !timeSlot}
-            onClick={() => setStep('detailsForm')}
-          >
-            Continue
-          </Button>
-        </div>
-      </Card>
-    );
-  };
-
-  const renderDetailsForm = () => (
-    <Card className="p-6 md:p-8">
-      {renderStepHeader()}
-      <h2 className="text-2xl font-bold text-foreground mb-2">Appointment Details</h2>
-      <p className="text-muted-foreground text-sm mb-6">
-        Your basic information is auto-filled from your profile. You can update it if needed.
-      </p>
-      <div className="grid md:grid-cols-2 gap-6 mb-6">
-        <div className="space-y-2">
-          <Label className="text-foreground">Patient name</Label>
-          <Input
-            type="text"
-            value={patientName}
-            onChange={(e) => setPatientName(e.target.value)}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label className="text-foreground">Contact number</Label>
-          <Input
-            type="tel"
-            value={contactNumber}
-            onChange={(e) => setContactNumber(e.target.value)}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label className="text-foreground">Appointment type</Label>
-          <Select value={appointmentType} onValueChange={setAppointmentType}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Consultation">Consultation</SelectItem>
-              <SelectItem value="Follow-up">Follow-up</SelectItem>
-              <SelectItem value="Checkup">Routine checkup</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label className="text-foreground">Reason for visit (optional)</Label>
-          <Textarea
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            className="h-24 resize-none"
-            placeholder="Describe your symptoms or reason for visit"
-          />
-        </div>
+        <Footer />
       </div>
-      <div className="flex justify-between mt-4">
-        <Button
-          variant="outline"
-          className="border-border text-primary hover:bg-accent"
-          onClick={() => setStep('dateTime')}
-        >
-          Back
-        </Button>
-        <Button
-          className="bg-primary text-white hover:bg-primary/90 font-semibold px-5"
-          disabled={!patientName || !contactNumber || !appointmentType}
-          onClick={() => setStep('confirm')}
-        >
-          Review & confirm
-        </Button>
-      </div>
-    </Card>
-  );
-
-  const renderConfirm = () => {
-    if (!selectedDoctor) return null;
-    const displayDate = date || '-';
-    const displayTime = timeSlot || '-';
-    const queuePreview = 'Will be assigned on confirm';
-
-    return (
-      <Card className="p-6 md:p-8">
-        {renderStepHeader()}
-        <h2 className="text-2xl font-bold text-foreground mb-4">Confirm Appointment</h2>
-        {createError && (
-          <Card className="p-4 mb-5 border-red-200 bg-red-50 text-red-700 text-sm">{createError}</Card>
-        )}
-        <div className="grid md:grid-cols-2 gap-6 mb-6 text-sm">
-          <div className="space-y-2">
-            <h3 className="font-semibold text-foreground mb-1">Doctor</h3>
-            <p className="text-muted-foreground">{selectedDoctor.fullName}</p>
-            <p className="text-primary">{specializationName(selectedDoctor.specializationId)}</p>
-            <p className="text-muted-foreground">{specializationName(selectedDoctor.specializationId)}</p>
-            <p className="text-muted-foreground text-xs mt-1">{DEFAULT_HOSPITAL_LABEL}</p>
-          </div>
-          <div className="space-y-2">
-            <h3 className="font-semibold text-foreground mb-1">Appointment</h3>
-            <p className="text-muted-foreground">Date: {displayDate}</p>
-            <p className="text-muted-foreground">Time: {displayTime}</p>
-            <p className="text-muted-foreground">Type: {appointmentType}</p>
-            <p className="text-muted-foreground text-xs">Queue number: {queuePreview}</p>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6 mb-6 text-sm">
-          <div className="space-y-2">
-            <h3 className="font-semibold text-foreground mb-1">Patient</h3>
-            <p className="text-muted-foreground">{patientName}</p>
-            <p className="text-muted-foreground">{contactNumber}</p>
-          </div>
-          <div className="space-y-2">
-            <h3 className="font-semibold text-foreground mb-1">Reason</h3>
-            <p className="text-muted-foreground min-h-[3rem]">{reason || 'Not specified'}</p>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap gap-3 justify-between mt-4">
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              className="border-border text-primary hover:bg-accent"
-              onClick={() => setStep('detailsForm')}
-            >
-              Edit details
-            </Button>
-            <Button
-              variant="outline"
-              className="border-red-200 text-red-600 hover:bg-red-50"
-              onClick={() => navigate('/patient-dashboard')}
-            >
-              Cancel booking
-            </Button>
-          </div>
-          <Button
-            className="bg-primary text-white hover:bg-primary/90 font-semibold px-6"
-            onClick={handleConfirm}
-            disabled={createLoading}
-          >
-            {createLoading ? 'Booking...' : 'Confirm Appointment'}
-          </Button>
-        </div>
-      </Card>
     );
-  };
-
-  const renderSuccess = () => {
-    if (!createdAppointment) return null;
-    return (
-      <Card className="p-6 md:p-8 text-center">
-        {renderStepHeader()}
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-14 h-14 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
-            <Check className="h-6 w-6" />
-          </div>
-          <h2 className="text-2xl font-bold text-foreground">Booking Successful</h2>
-          <p className="text-muted-foreground text-sm max-w-md">
-            Your appointment has been successfully booked. Please arrive at the hospital at least 15 minutes before your selected time.
-          </p>
-          <div className="mt-4 grid md:grid-cols-2 gap-4 text-sm text-left w-full max-w-xl">
-            <Card className="bg-muted p-4">
-              <h3 className="font-semibold text-foreground mb-1">Appointment</h3>
-              <p className="text-muted-foreground">ID: {createdAppointment.id}</p>
-              <p className="text-muted-foreground">
-                Date & time: {createdAppointment.date} at {createdAppointment.timeSlot}
-              </p>
-              <p className="text-muted-foreground">Doctor: {createdAppointment.doctorName}</p>
-              <p className="text-muted-foreground">Queue number: {createdAppointment.queueNumber}</p>
-            </Card>
-            <Card className="bg-muted p-4">
-              <h3 className="font-semibold text-foreground mb-1">Instructions</h3>
-              <ul className="list-disc pl-4 space-y-1 text-muted-foreground">
-                <li>Arrive 15 minutes before your scheduled time.</li>
-                <li>Bring your previous prescriptions and reports if available.</li>
-                <li>Carry a valid identity document.</li>
-              </ul>
-            </Card>
-          </div>
-
-          <div className="flex flex-wrap gap-3 justify-center mt-6">
-            <Button
-              className="bg-primary text-white hover:bg-primary/90 font-semibold px-5"
-              onClick={() => navigate('/my-appointments')}
-            >
-              View appointment
-            </Button>
-            <Button
-              variant="outline"
-              className="border-border text-primary hover:bg-accent font-semibold px-5"
-              onClick={() => window.alert('Download as PDF can be implemented here.')}
-            >
-              Download confirmation (PDF)
-            </Button>
-            <Button
-              variant="outline"
-              className="border-green-200 text-green-700 hover:bg-green-50 font-semibold px-5"
-              onClick={resetForAnother}
-            >
-              Book another appointment
-            </Button>
-            
-          </div>
-        </div>
-      </Card>
-    );
-  };
+  }
 
   return (
-    <div className="min-h-screen flex flex-col bg-muted">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white">
       <PatientDashboardNavBar navLinks={navLinks} />
-      <main className="flex-1 max-w-6xl mx-auto mt-8 px-4 pb-10 space-y-8">
+
+      <main className="flex-1 max-w-6xl mx-auto px-6 mt-10 pb-16 space-y-8">
         {step === 'selectDoctor' && renderDoctorSelection()}
         {step === 'dateTime' && renderDateTimeSelection()}
         {step === 'detailsForm' && renderDetailsForm()}
         {step === 'confirm' && renderConfirm()}
         {step === 'success' && renderSuccess()}
       </main>
+
       <Footer />
     </div>
   );

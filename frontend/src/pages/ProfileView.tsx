@@ -43,10 +43,15 @@ const ProfileView: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-muted">
+    <div className="min-h-screen flex flex-col bg-muted bg-gradient-to-b from-blue-50 via-white to-blue-100">
       <PatientDashboardNavBar navLinks={navLinks} />
       <main className="flex-1 max-w-6xl mx-auto mt-8 px-4 pb-10 space-y-6">
-        <Card className="p-6 md:p-8">
+        {state?.success && (
+          <Card className="p-4 rounded-2xl border-emerald-200 bg-emerald-50 text-emerald-700 text-sm">
+            {state.success}
+          </Card>
+        )}
+        <Card className="p-6 rounded-3xl md:p-8">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl font-semibold text-foreground mb-1">My Profile</h1>
@@ -63,13 +68,7 @@ const ProfileView: React.FC = () => {
           </div>
         </Card>
 
-        {state?.success && (
-          <Card className="p-4 border-emerald-200 bg-emerald-50 text-emerald-700 text-sm">
-            {state.success}
-          </Card>
-        )}
-
-        <Card className="p-6 md:p-8">
+        <Card className="p-6 rounded-3xl md:p-8">
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <div className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Name</div>

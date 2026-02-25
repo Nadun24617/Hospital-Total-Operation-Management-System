@@ -127,15 +127,17 @@ const PatientDashboardNavBar: React.FC<PatientDashboardNavBarProps> = ({ navLink
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>
-                      {user?.firstName}
+                      <span className="font-medium text-gray-800">
+                        {user ? `${user.firstName} ${user.lastName}` : 'User'}
+                      </span>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => navigate('/profile/edit')}>
-                      <Settings className="h-4 w-4 mr-2" />
+                      <Settings className="h-4 w-4 mr-2 text-gray-800" />
                       Edit Profile
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={logout}>
-                      <LogOut className="h-4 w-4 mr-2" />
+                      <LogOut className="h-4 w-4 mr-2 text-red-800" />
                       Logout
                     </DropdownMenuItem>
                   </DropdownMenuContent>
