@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-import loginBackground from '../assets/Login-Background.png';
+import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,6 +24,8 @@ export default function Signup({ onSuccess, onCancel }: SignupProps) {
   const [form, setForm] = useState(initialForm);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -57,114 +59,180 @@ export default function Signup({ onSuccess, onCancel }: SignupProps) {
   };
 
   return (
-    <div
-      className="relative flex min-h-screen items-center justify-center bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: `url(${loginBackground})` }}
-    >
-      <div className="absolute inset-0 bg-black/50" />
-      <form
-        onSubmit={handleSubmit}
-        className="relative z-10 w-full max-w-2xl rounded-lg border border-white/20 bg-white/10 p-10 text-white shadow-lg backdrop-blur-xl"
-      >
-        <h2 className="text-2xl font-semibold mb-6 text-center">Create an Account</h2>
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 via-white to-blue-100 px-6 py-12">
+    
+    <div className="w-full max-w-2xl">
+      
+      {/* Branding */}
+      <div className="text-center mb-8">
+        <p className="text-xs uppercase tracking-widest text-primary font-medium">
+          ABC Hospital
+        </p>
+        <h1 className="text-3xl font-bold text-gray-800 mt-2">
+          Create Your Account
+        </h1>
+        <p className="text-gray-500 text-sm mt-2">
+          Register to access appointments, records, and hospital services
+        </p>
+      </div>
+
+      {/* Signup Card */}
+      <div className="bg-white rounded-2xl shadow-xl p-8 md:p-10 border border-gray-100">
+        
         {error && (
-          <Alert variant="destructive" className="mb-4 bg-red-500/20 border-red-400/30">
-            <AlertDescription className="text-red-200 text-sm">{error}</AlertDescription>
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
+
         {success && (
-          <Alert className="mb-4 bg-emerald-500/20 border-emerald-400/30">
-            <AlertDescription className="text-emerald-200 text-sm">{success}</AlertDescription>
+          <Alert className="mb-4 bg-emerald-50 border-emerald-200 text-emerald-700">
+            <AlertDescription>{success}</AlertDescription>
           </Alert>
         )}
-        <div className="mb-4 flex flex-col gap-4 md:flex-row">
-          <div className="w-full md:w-1/2">
-            <Label htmlFor="firstName" className="mb-1 font-medium text-white">First Name</Label>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+
+          {/* Name Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <Label htmlFor="firstName" className="text-gray-700">
+                First Name
+              </Label>
+              <Input
+                id="firstName"
+                name="firstName"
+                type="text"
+                value={form.firstName}
+                onChange={handleChange}
+                className="mt-1"
+                required
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="lastName" className="text-gray-700">
+                Last Name
+              </Label>
+              <Input
+                id="lastName"
+                name="lastName"
+                type="text"
+                value={form.lastName}
+                onChange={handleChange}
+                className="mt-1"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Email */}
+          <div>
+            <Label htmlFor="email" className="text-gray-700">
+              Email Address
+            </Label>
             <Input
-              id="firstName"
-              name="firstName"
-              type="text"
-              className="bg-white/15 border-white/40 text-white placeholder:text-white/70 focus-visible:ring-white/50"
-              value={form.firstName}
+              id="email"
+              name="email"
+              type="email"
+              value={form.email}
               onChange={handleChange}
+              className="mt-1"
               required
             />
           </div>
-          <div className="w-full md:w-1/2">
-            <Label htmlFor="lastName" className="mb-1 font-medium text-white">Last Name</Label>
+
+          {/* Phone */}
+          <div>
+            <Label htmlFor="phone" className="text-gray-700">
+              Phone Number
+            </Label>
             <Input
-              id="lastName"
-              name="lastName"
-              type="text"
-              className="bg-white/15 border-white/40 text-white placeholder:text-white/70 focus-visible:ring-white/50"
-              value={form.lastName}
+              id="phone"
+              name="phone"
+              type="tel"
+              value={form.phone}
               onChange={handleChange}
+              className="mt-1"
               required
             />
           </div>
-        </div>
-        <div className="mb-4">
-          <Label htmlFor="email" className="mb-1 font-medium text-white">Email</Label>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            className="bg-white/15 border-white/40 text-white placeholder:text-white/70 focus-visible:ring-white/50"
-            value={form.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <Label htmlFor="phone" className="mb-1 font-medium text-white">Phone Number</Label>
-          <Input
-            id="phone"
-            name="phone"
-            type="tel"
-            className="bg-white/15 border-white/40 text-white placeholder:text-white/70 focus-visible:ring-white/50"
-            value={form.phone}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <Label htmlFor="password" className="mb-1 font-medium text-white">Password</Label>
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            className="bg-white/15 border-white/40 text-white placeholder:text-white/70 focus-visible:ring-white/50"
-            value={form.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="mb-6">
-          <Label htmlFor="confirmPassword" className="mb-1 font-medium text-white">Confirm Password</Label>
-          <Input
-            id="confirmPassword"
-            name="confirmPassword"
-            type="password"
-            className="bg-white/15 border-white/40 text-white placeholder:text-white/70 focus-visible:ring-white/50"
-            value={form.confirmPassword}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <Button type="submit" className="w-full mb-3 bg-primary hover:bg-primary/90 text-white font-medium">
-          Sign Up
-        </Button>
-        {onCancel && (
+
+          {/* Password Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <Label htmlFor="password" className="text-gray-700">
+                Password
+              </Label>
+              <div className="relative mt-1">
+            <Input
+                id="password"
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                value={form.password}
+                onChange={handleChange}
+                className="pr-10"
+                required
+            />
+
+              <button
+                  type="button"
+                  onClick={() => setShowPassword(prev => !prev)}
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-primary"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="confirmPassword" className="text-gray-700">
+                Confirm Password
+              </Label>
+              <div className="relative mt-1">
+              <Input
+                id="confirmPassword"
+                name="confirmPassword"
+                type={showConfirmPassword ? 'text' : 'password'}
+                value={form.confirmPassword}
+                onChange={handleChange}
+                className="pr-10"
+                required
+              />
+
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(prev => !prev)}
+                className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-primary"
+              >
+                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+            </div>
+          </div>
+
+          {/* Submit */}
           <Button
-            type="button"
-            variant="link"
-            className="w-full text-sm text-white/80 hover:text-white"
-            onClick={onCancel}
+            type="submit"
+            className="w-full mt-4 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg"
           >
-            Already have an account? Log in
+            Create Account
           </Button>
-        )}
-      </form>
+
+          {onCancel && (
+            <Button
+              type="button"
+              variant="link"
+              className="w-full text-sm text-primary mt-2"
+              onClick={onCancel}
+            >
+              Already have an account? Log in
+            </Button>
+          )}
+
+        </form>
+      </div>
     </div>
-  );
+  </div>
+);
 }
