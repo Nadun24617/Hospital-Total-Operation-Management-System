@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, ClipboardList, FolderOpen, CreditCard, FlaskConical } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import heroImage from '@/assets/hospital-hero.png';
 
 const navLinks = [
   { label: 'About Us', id: 'hospital' },
@@ -15,7 +16,12 @@ const navLinks = [
 const PatientDashboard: React.FC = () => {
   const navigate = useNavigate();
 
-  const quickAccessCards: { title: string; desc: string; icon: LucideIcon; onClick?: () => void }[] = [
+  const quickAccessCards: {
+    title: string;
+    desc: string;
+    icon: LucideIcon;
+    onClick?: () => void;
+  }[] = [
     { title: 'Appointments', desc: 'Book a new appointment', icon: Calendar, onClick: () => navigate('/appointments') },
     { title: 'My Appointments', desc: 'View and manage bookings', icon: ClipboardList, onClick: () => navigate('/my-appointments') },
     { title: 'Patient Records', desc: 'Secure medical history', icon: FolderOpen },
@@ -24,118 +30,153 @@ const PatientDashboard: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-muted">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 via-white to-blue-100">
       <PatientDashboardNavBar navLinks={navLinks} />
 
-      <main className="flex-1 max-w-6xl mx-auto mt-8 p-4 space-y-12">
-        <Card className="p-8 md:p-10 flex flex-col md:flex-row items-center gap-8">
-          <div className="flex-1">
-            <p className="text-xs uppercase tracking-widest text-primary mb-2">Welcome to ABC Hospital</p>
-            <h1 className="text-2xl md:text-3xl font-semibold text-foreground mb-3">
-              Efficient Care, <span className="text-primary">Seamless Management</span>
-            </h1>
-            <p className="text-muted-foreground mb-6 max-w-xl">
-              Access appointments, medical records, billing, and hospital services from a single, secure dashboard built for patients, doctors, and administrators.
-            </p>
-          </div>
-          <div className="flex-1 flex justify-center">
-            <div className="w-full max-w-sm h-48 md:h-60 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground text-sm md:text-base">
-              Modern hospital illustration / hero image
-            </div>
-          </div>
-        </Card>
+      <main className="flex-1 max-w-7xl mx-auto px-6 mt-10 space-y-20">
 
+        {/* ================= HERO ================= */}
+<section className="relative rounded-3xl overflow-hidden shadow-xl bg-white">
+
+  {/* Background Image */}
+  <img
+    src={heroImage}
+    alt="Hospital"
+    className="absolute inset-0 w-full h-full object-cover"
+  />
+
+  {/* Left Side Fade (Important Part) */}
+  <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent" />
+
+  <div className="relative z-10\ p-12 md:p-16 max-w-3xl space-y-10">
+    <p className="text-xs uppercase tracking-widest text-primary font-medium">
+      Welcome to ABC Hospital
+    </p>
+
+    <h1 className="text-4xl md:text-5xl font-bold text-gray-800 leading-tight">
+      Efficient Care,{' '}
+      <span className="text-primary">Seamless Management</span>
+    </h1>
+
+    <p className="text-gray-600 text-lg leading-relaxed">
+      Access appointments, medical records, billing, and hospital services
+      from a single, secure dashboard built for patients, doctors, and administrators.
+    </p>
+
+    <div className="flex gap-4 pt-2">
+      <button
+        onClick={() => navigate('/appointments')}
+        className="px-6 py-2 rounded-lg bg-primary text-white shadow-md hover:shadow-lg hover:scale-105 transition"
+      >
+        Book Appointment
+      </button>
+
+      <button
+        onClick={() => navigate('/doctors')}
+        className="px-6 py-2 rounded-lg border border-primary text-primary hover:bg-primary hover:text-white transition"
+      >
+        View Doctors
+      </button>
+    </div>
+  </div>
+</section>
+
+        {/* ================= QUICK ACCESS ================= */}
         <section>
-          <h2 className="text-lg font-semibold text-foreground mb-4">Quick Access</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+            Quick Access
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {quickAccessCards.map(card => {
               const clickable = Boolean(card.onClick);
+
               return (
                 <Card
                   key={card.title}
-                  className={
-                    'transition p-5 flex flex-col gap-3 ' +
-                    (clickable ? 'hover:border-primary/40 cursor-pointer' : '')
-                  }
                   onClick={card.onClick}
+                  className={`group p-6 rounded-2xl border-none shadow-md bg-white transition-all duration-300 
+                  ${clickable ? 'hover:-translate-y-2 hover:shadow-xl cursor-pointer' : ''}`}
                 >
-                  <card.icon className="h-5 w-5 text-primary" />
-                  <div className="font-medium text-foreground">{card.title}</div>
-                  <div className="text-muted-foreground text-sm">{card.desc}</div>
+                  <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-primary/10 mb-4 group-hover:bg-primary/20 transition">
+                    <card.icon className="h-6 w-6 text-primary" />
+                  </div>
+
+                  <div className="font-semibold text-gray-800">
+                    {card.title}
+                  </div>
+
+                  <div className="text-gray-500 text-sm mt-1">
+                    {card.desc}
+                  </div>
                 </Card>
               );
             })}
           </div>
         </section>
 
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-          <Card>
+        {/* ================= INFO SECTION ================= */}
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-16">
+
+          <Card className="rounded-2xl shadow-md border-none">
             <CardHeader>
-              <CardTitle className="text-base text-foreground">Hospital at a Glance</CardTitle>
+              <CardTitle>Hospital at a Glance</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <div className="text-2xl font-semibold text-primary">500+</div>
-                  <div className="text-muted-foreground">Specialist Doctors</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-semibold text-primary">24/7</div>
-                  <div className="text-muted-foreground">Emergency Services</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-semibold text-primary">10+</div>
-                  <div className="text-muted-foreground">Advanced Departments</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-semibold text-primary">98%</div>
-                  <div className="text-muted-foreground">Patient Satisfaction</div>
-                </div>
+              <div className="grid grid-cols-2 gap-6 text-center">
+                {[
+                  { value: '500+', label: 'Specialist Doctors' },
+                  { value: '24/7', label: 'Emergency Services' },
+                  { value: '10+', label: 'Advanced Departments' },
+                  { value: '98%', label: 'Patient Satisfaction' },
+                ].map(item => (
+                  <div key={item.label}>
+                    <div className="text-3xl font-bold text-primary">
+                      {item.value}
+                    </div>
+                    <div className="text-sm text-gray-500 mt-1">
+                      {item.label}
+                    </div>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
-          <Card>
+
+          <Card className="rounded-2xl shadow-md border-none">
             <CardHeader>
-              <CardTitle className="text-base text-foreground">What Our Patients Say</CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-3">
-              <p className="text-muted-foreground text-sm italic">
-                "ABC Hospital made my surgery journey smooth and stress-free. The staff were caring, and all my reports were available online in seconds."
-              </p>
-              <div className="text-sm text-muted-foreground">— Patient Feedback</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base text-foreground">Latest Updates</CardTitle>
+              <CardTitle>What Our Patients Say</CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="text-sm text-muted-foreground space-y-2">
+              <p className="text-gray-600 italic text-sm leading-relaxed">
+                "ABC Hospital made my surgery journey smooth and stress-free.
+                The staff were caring, and all my reports were available online in seconds."
+              </p>
+              <div className="text-sm text-gray-500 mt-4">— Patient Feedback</div>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-2xl shadow-md border-none">
+            <CardHeader>
+              <CardTitle>Latest Updates</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="text-sm text-gray-600 space-y-3">
                 <li>• Free heart health camp – 25th Dec</li>
                 <li>• COVID-19 booster vaccination drive ongoing</li>
                 <li>• New oncology wing inaugurated</li>
               </ul>
             </CardContent>
           </Card>
+
         </section>
 
-        <Card className="p-6 md:p-8">
-          <h2 className="text-lg font-semibold text-foreground mb-4">Who Can Use This Portal?</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            {[
-              { title: 'Patients', desc: 'Manage appointments, records, and bills in one place.' },
-              { title: 'Doctors', desc: 'Access schedules, patient charts, and clinical data.' },
-              { title: 'Staff / Admin', desc: 'Oversee operations, billing, and analytics.' },
-            ].map(role => (
-              <Card key={role.title} className="bg-muted/50 p-4">
-                <div className="font-medium text-foreground mb-1">{role.title}</div>
-                <div className="text-muted-foreground text-sm">{role.desc}</div>
-              </Card>
-            ))}
-          </div>
-        </Card>
       </main>
-      <Footer />
+
+      {/* Extra spacing before footer */}
+      <div className="mt-16">
+        <Footer />
+      </div>
     </div>
   );
 };

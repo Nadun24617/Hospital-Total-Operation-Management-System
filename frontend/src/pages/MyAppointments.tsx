@@ -128,26 +128,74 @@ const MyAppointments: React.FC = () => {
     }
   };
 
-  if (!isLoggedIn || !token) {
-    return (
-      <div className="min-h-screen flex flex-col bg-muted">
-        <PatientDashboardNavBar navLinks={navLinks} />
-        <main className="flex-1 max-w-3xl mx-auto mt-12 px-4">
-          <Card className="p-8 flex flex-col items-center text-center gap-4">
-            <h1 className="text-2xl font-semibold text-foreground">My Appointments</h1>
-            <p className="text-muted-foreground">Please log in to view your appointments.</p>
+ if (!isLoggedIn || !token) {
+  return (
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 via-white to-blue-100">
+      <PatientDashboardNavBar navLinks={navLinks} />
+
+      <main className="flex-1 flex items-center justify-center px-4 py-16">
+        <Card
+          className="relative w-full max-w-xl p-12 text-center space-y-6
+                     backdrop-blur-sm bg-white/70 dark:bg-background/60
+                     shadow-xl rounded-3xl border
+                     transition-all duration-500
+                     hover:shadow-2xl"
+        >
+          <div className="mx-auto w-20 h-20 rounded-full bg-primary/10 
+                          flex items-center justify-center
+                          transition-transform duration-300
+                          hover:scale-110">
+            <svg
+              className="w-10 h-10 text-primary"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M8 7V3m8 4V3m-9 8h10m-11 8h12a2 2 0 002-2V7a2 2 0 
+                   00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">
+            My Appointments
+          </h1>
+
+          <p className="text-muted-foreground text-base leading-relaxed">
+            Please log in to view your appointments.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Button
-              className="mt-2 bg-primary text-white hover:bg-primary/90 font-semibold px-6"
+              className="bg-primary text-white font-semibold px-8 py-2
+                         rounded-xl transition-all duration-300
+                         hover:bg-primary/90 hover:scale-105
+                         active:scale-95 shadow-md"
               onClick={() => navigate('/login')}
             >
               Go to Login
             </Button>
-          </Card>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
+
+            <Button
+              variant="outline"
+              className="rounded-xl px-8 py-2 transition-all duration-300
+                         hover:bg-muted"
+              onClick={() => navigate('/')}
+            >
+              Back to Home
+            </Button>
+          </div>
+        </Card>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
 
   const renderAppointmentCard = (a: ApiAppointment) => {
     const doctorName = a.doctor?.fullName ?? `Doctor #${a.doctorId}`;

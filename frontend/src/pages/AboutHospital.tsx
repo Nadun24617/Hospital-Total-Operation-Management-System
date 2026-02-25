@@ -1,14 +1,15 @@
 import React from 'react';
 import PatientDashboardNavBar from '../components/PatientDashboardNavBar';
 import Footer from '../components/Footer';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-
-const heroImages = [
-  '/assets/hospital1.jpg',
-  '/assets/hospital2.jpg',
-  '/assets/hospital3.jpg',
-];
+import { Card } from '@/components/ui/card';
+import {
+  HeartPulse,
+  Stethoscope,
+  Building2,
+  Clock,
+  Phone,
+  ShieldCheck,
+} from 'lucide-react';
 
 const navLinks = [
   { label: 'About Us', id: 'hospital' },
@@ -17,179 +18,226 @@ const navLinks = [
 ];
 
 const AboutHospital: React.FC = () => {
-  const [current, setCurrent] = React.useState(0);
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % heroImages.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
-    <div className="min-h-screen flex flex-col bg-muted">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 via-white to-blue-100">
       <PatientDashboardNavBar navLinks={navLinks} />
-      <div className="flex-1 max-w-5xl mx-auto py-10 px-4 space-y-10">
-        {/* Hero Section */}
-        <div className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden border border-border">
-          {heroImages.map((img, idx) => (
-            <img
-              key={img}
-              src={img}
-              alt="Hospital Hero"
-              className={`absolute w-full h-full object-cover transition-opacity duration-1000 ${idx === current ? 'opacity-100' : 'opacity-0'}`}
-              style={{zIndex: idx === current ? 2 : 1}}
-            />
-          ))}
-          <div className="absolute inset-0 bg-gradient-to-t from-blue-900/40 to-transparent z-10" />
-          <div className="absolute bottom-6 left-6 z-20 text-white">
-            <h1 className="text-2xl md:text-4xl font-semibold drop-shadow-lg">About ABC Hospital</h1>
+
+      <main className="flex-1 max-w-7xl mx-auto px-6 mt-16 space-y-24">
+
+        {/* ================= PAGE HEADER ================= */}
+        <section className="text-center space-y-4">
+          <p className="text-xs uppercase tracking-widest text-primary font-medium">
+            About ABC Hospital
+          </p>
+
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-800">
+            Excellence in Healthcare,
+            <span className="text-primary"> Powered by Innovation</span>
+          </h1>
+
+          <p className="text-gray-600 max-w-3xl mx-auto text-lg">
+            Delivering patient-centered care through advanced medical
+            technology and compassionate expertise.
+          </p>
+        </section>
+
+        {/* ================= MISSION & VISION ================= */}
+        <section className="grid md:grid-cols-2 gap-10">
+          <Card className="p-10 rounded-3xl border-none shadow-lg bg-white hover:shadow-2xl transition">
+            <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-primary/10 mb-6">
+              <HeartPulse className="text-primary" />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+              Our Mission
+            </h2>
+            <p className="text-gray-600 leading-relaxed">
+              To deliver accessible, affordable, and high-quality healthcare
+              services while maintaining safety, clinical excellence,
+              and ethical medical standards.
+            </p>
+          </Card>
+
+          <Card className="p-10 rounded-3xl border-none shadow-lg bg-white hover:shadow-2xl transition">
+            <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-primary/10 mb-6">
+              <ShieldCheck className="text-primary" />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+              Our Vision
+            </h2>
+            <p className="text-gray-600 leading-relaxed">
+              To be a leading digital healthcare institution recognized
+              for innovation, excellence, and patient trust.
+            </p>
+          </Card>
+        </section>
+
+        {/* ================= MEDICAL SERVICES ================= */}
+        <section>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-8">
+            Medical Services
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              'General Medicine & OPD',
+              'Emergency & Trauma Care',
+              'Cardiology & Heart Care',
+              'Pediatrics & Child Health',
+              'Orthopedics & Physiotherapy',
+              'Diagnostic Laboratory & Imaging',
+            ].map(service => (
+              <Card
+                key={service}
+                className="p-8 rounded-2xl border-none shadow-md bg-white hover:-translate-y-2 hover:shadow-xl transition"
+              >
+                <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary/10 mb-4">
+                  <Stethoscope className="text-primary" />
+                </div>
+                <div className="font-medium text-gray-800">
+                  {service}
+                </div>
+              </Card>
+            ))}
           </div>
-        </div>
+        </section>
 
-        {/* About Info */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg font-medium text-foreground">ABC Hospital</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-muted-foreground">ABC Hospital is a multi-specialty healthcare institution dedicated to providing high-quality, patient-centered medical services through advanced technology and professional medical care.</p>
-            <p className="text-muted-foreground">Established in 2012, ABC Hospital has become a trusted healthcare provider, delivering reliable and efficient medical services while maintaining high standards of safety, ethics, and patient satisfaction.</p>
-          </CardContent>
-        </Card>
-
-        <div className="grid md:grid-cols-2 gap-8">
-          <Card className="">
-            <CardHeader>
-              <CardTitle className="text-lg font-medium text-foreground">Our Mission</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">To deliver accessible, affordable, and high-quality healthcare services while ensuring patient safety, clinical excellence, and ethical medical practices.</p>
-            </CardContent>
-          </Card>
-          <Card className="">
-            <CardHeader>
-              <CardTitle className="text-lg font-medium text-foreground">Our Vision</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">To be a leading digital healthcare institution recognized for innovation, quality medical care, and patient trust.</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Separator />
-
-        <Card className="">
-          <CardHeader>
-            <CardTitle className="text-lg font-medium text-foreground">Our Services</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="list-disc pl-6 text-muted-foreground space-y-1">
-              <li>General Medicine and OPD Services</li>
-              <li>Emergency and Trauma Care (24/7)</li>
-              <li>Cardiology and Heart Care</li>
-              <li>Dermatology and Skin Care</li>
-              <li>Pediatrics and Child Health Services</li>
-              <li>Gynecology and Maternity Care</li>
-              <li>Orthopedics and Physiotherapy</li>
-              <li>Diagnostic Laboratory Services</li>
-              <li>Medical Imaging and Radiology</li>
-              <li>Pharmacy Services</li>
-            </ul>
-          </CardContent>
-        </Card>
-
-        <Card className="">
-          <CardHeader>
-            <CardTitle className="text-lg font-medium text-foreground">Our Medical Team</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="list-disc pl-6 text-muted-foreground space-y-1">
-              <li>Over 45 specialist and general physicians</li>
-              <li>More than 120 trained nursing professionals</li>
-              <li>Dedicated laboratory and technical staff</li>
-              <li>24-hour emergency medical personnel</li>
-              <li>All medical professionals are registered with the Sri Lanka Medical Council (SLMC) and follow nationally approved clinical standards.</li>
-            </ul>
-          </CardContent>
-        </Card>
-
-        <Separator />
-
-        <Card className="">
-          <CardHeader>
-            <CardTitle className="text-lg font-medium text-foreground">Hospital Facilities</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="list-disc pl-6 text-muted-foreground space-y-1">
-              <li>Over 150 inpatient beds</li>
-              <li>Intensive Care Unit (ICU) and Coronary Care Unit (CCU)</li>
-              <li>Fully equipped operation theatres</li>
-              <li>Digital patient record management system</li>
-              <li>Online appointment scheduling</li>
-              <li>Ambulance and emergency transport services</li>
-              <li>Accessibility support for elderly and differently-abled patients</li>
-            </ul>
-          </CardContent>
-        </Card>
-
-        <Card className="">
-          <CardHeader>
-            <CardTitle className="text-lg font-medium text-foreground">Hospital Performance Overview (Sample Data)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="list-disc pl-6 text-muted-foreground space-y-1">
-              <li>Annual patients treated: 25,000+</li>
-              <li>Total surgeries performed: 8,500+</li>
-              <li>Average emergency response time: Under 5 minutes</li>
-              <li>Patient satisfaction rate: 96%</li>
-            </ul>
-          </CardContent>
-        </Card>
-
-        <Separator />
-
-        <Card className="">
-          <CardHeader>
-            <CardTitle className="text-lg font-medium text-foreground">Operating Hours</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="list-disc pl-6 text-muted-foreground space-y-1">
-              <li>Outpatient Department (OPD): 8.00 AM – 8.00 PM (Daily)</li>
-              <li>Emergency Services: Available 24/7</li>
-              <li>Pharmacy: 8.00 AM – 10.00 PM</li>
-            </ul>
-          </CardContent>
-        </Card>
-
-        <Card className="">
-          <CardHeader>
-            <CardTitle className="text-lg font-medium text-foreground">Contact Information</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="list-disc pl-6 text-muted-foreground space-y-1">
-              <li>Address: No. 125, Main Street, Colombo 07</li>
-              <li>Hotline: +94 11 234 5678</li>
-              <li>Email: info@abchospital.lk</li>
-            </ul>
-          </CardContent>
-        </Card>
-
-        <Card className="">
-          <CardHeader>
-            <CardTitle className="text-lg font-medium text-foreground">Why Choose ABC Hospital</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="list-disc pl-6 text-muted-foreground space-y-1">
-              <li>Experienced and qualified medical professionals</li>
-              <li>Modern medical equipment and infrastructure</li>
-              <li>Efficient and accurate diagnostic services</li>
-              <li>Secure and patient-friendly digital systems</li>
-              <li>Clean, safe, and well-maintained environment</li>
-            </ul>
-          </CardContent>
-        </Card>
+        {/* ================= HOSPITAL FACILITIES ================= */}
+<section>
+  <Card className="p-12 rounded-3xl border-none shadow-xl bg-gradient-to-br from-white to-blue-50 hover:shadow-2xl transition">
+    <div className="flex items-center gap-4 mb-10">
+      <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-primary/15">
+        <Building2 className="text-primary" />
       </div>
-      <Footer />
+      <h2 className="text-2xl font-semibold text-gray-800">
+        Hospital Facilities
+      </h2>
+    </div>
+
+    <div className="grid md:grid-cols-2 gap-6">
+      {[
+        'ICU & CCU Units',
+        'Fully Equipped Operation Theatres',
+        'Digital Patient Record System',
+        'Online Appointment Scheduling',
+        'Ambulance & Emergency Transport',
+        'Accessibility Support Infrastructure',
+      ].map(item => (
+        <div
+          key={item}
+          className="flex items-start gap-3 bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition"
+        >
+          <div className="w-2 h-2 bg-primary rounded-full mt-2" />
+          <span className="text-gray-700 text-sm">{item}</span>
+        </div>
+      ))}
+    </div>
+  </Card>
+</section>
+
+        {/* ================= OPERATING HOURS ================= */}
+<section>
+  <Card className="p-12 rounded-3xl border-none shadow-xl bg-white hover:shadow-2xl transition">
+    <div className="flex items-center gap-4 mb-8">
+      <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-primary/10">
+        <Clock className="text-primary" />
+      </div>
+      <h2 className="text-2xl font-semibold text-gray-800">
+        Operating Hours
+      </h2>
+    </div>
+
+    <div className="grid md:grid-cols-3 gap-6 text-center">
+      <div className="bg-blue-50 rounded-2xl p-6">
+        <p className="text-sm text-gray-500 mb-2">OPD</p>
+        <p className="font-semibold text-gray-800">
+          8:00 AM – 8:00 PM
+        </p>
+      </div>
+
+      <div className="bg-blue-50 rounded-2xl p-6">
+        <p className="text-sm text-gray-500 mb-2">Emergency</p>
+        <p className="font-semibold text-gray-800">
+          24 / 7 Service
+        </p>
+      </div>
+
+      <div className="bg-blue-50 rounded-2xl p-6">
+        <p className="text-sm text-gray-500 mb-2">Pharmacy</p>
+        <p className="font-semibold text-gray-800">
+          8:00 AM – 10:00 PM
+        </p>
+      </div>
+    </div>
+  </Card>
+</section>
+{/* ================= CONTACT ================= */}
+<section>
+  <Card className="p-12 rounded-3xl border-none shadow-xl bg-white hover:shadow-2xl transition">
+    <div className="flex items-center gap-4 mb-8">
+      <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-primary/10">
+        <Phone className="text-primary" />
+      </div>
+      <h2 className="text-2xl font-semibold text-gray-800">
+        Contact Information
+      </h2>
+    </div>
+
+    <div className="grid md:grid-cols-3 gap-6 text-center">
+
+      <div className="bg-blue-50 rounded-2xl p-6">
+        <p className="text-sm text-gray-500 mb-2">Address</p>
+        <p className="font-semibold text-gray-800">
+          No.125, Main Street<br />
+          Colombo 07
+        </p>
+      </div>
+
+      <div className="bg-blue-50 rounded-2xl p-6">
+        <p className="text-sm text-gray-500 mb-2">Hotline</p>
+        <p className="font-semibold text-gray-800">
+          +94 11 234 5678
+        </p>
+      </div>
+
+      <div className="bg-blue-50 rounded-2xl p-6">
+        <p className="text-sm text-gray-500 mb-2">Email</p>
+        <p className="font-semibold text-gray-800">
+          info@abchospital.lk
+        </p>
+      </div>
+
+    </div>
+  </Card>
+</section>
+
+        {/* ================= STATS ================= */}
+        <section>
+          <Card className="rounded-2xl border-none shadow-md bg-white p-12">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-10 text-center">
+              {[
+                { value: '150+', label: 'Inpatient Beds' },
+                { value: '45+', label: 'Specialist Doctors' },
+                { value: '25,000+', label: 'Patients Annually' },
+                { value: '96%', label: 'Patient Satisfaction' },
+              ].map(item => (
+                <div key={item.label}>
+                  <div className="text-4xl font-bold text-primary">
+                    {item.value}
+                  </div>
+                  <div className="text-sm text-gray-500 mt-2">
+                    {item.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </section>
+
+      </main>
+
+      <div className="mt-20">
+        <Footer />
+      </div>
     </div>
   );
 };
