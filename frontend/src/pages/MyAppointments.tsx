@@ -128,26 +128,74 @@ const MyAppointments: React.FC = () => {
     }
   };
 
-  if (!isLoggedIn || !token) {
-    return (
-      <div className="min-h-screen flex flex-col bg-muted">
-        <PatientDashboardNavBar navLinks={navLinks} />
-        <main className="flex-1 max-w-3xl mx-auto mt-12 px-4">
-          <Card className="p-8 flex flex-col items-center text-center gap-4">
-            <h1 className="text-2xl font-semibold text-foreground">My Appointments</h1>
-            <p className="text-muted-foreground">Please log in to view your appointments.</p>
+ if (!isLoggedIn || !token) {
+  return (
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 via-white to-blue-100">
+      <PatientDashboardNavBar navLinks={navLinks} />
+
+      <main className="flex-1 flex items-center justify-center px-4 py-16">
+        <Card
+          className="relative w-full max-w-xl p-12 text-center space-y-6
+                     backdrop-blur-sm bg-white/70 dark:bg-background/60
+                     shadow-xl rounded-3xl border
+                     transition-all duration-500
+                     hover:shadow-2xl"
+        >
+          <div className="mx-auto w-20 h-20 rounded-full bg-primary/10 
+                          flex items-center justify-center
+                          transition-transform duration-300
+                          hover:scale-110">
+            <svg
+              className="w-10 h-10 text-primary"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M8 7V3m8 4V3m-9 8h10m-11 8h12a2 2 0 002-2V7a2 2 0 
+                   00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">
+            My Appointments
+          </h1>
+
+          <p className="text-muted-foreground text-base leading-relaxed">
+            Please log in to view your appointments.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Button
-              className="mt-2 bg-primary text-white hover:bg-primary/90 font-semibold px-6"
+              className="bg-primary text-white font-semibold px-8 py-2
+                         rounded-xl transition-all duration-300
+                         hover:bg-primary/90 hover:scale-105
+                         active:scale-95 shadow-md"
               onClick={() => navigate('/login')}
             >
               Go to Login
             </Button>
-          </Card>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
+
+            <Button
+              variant="outline"
+              className="rounded-xl px-8 py-2 transition-all duration-300
+                         hover:bg-muted"
+              onClick={() => navigate('/')}
+            >
+              Back to Home
+            </Button>
+          </div>
+        </Card>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
 
   const renderAppointmentCard = (a: ApiAppointment) => {
     const doctorName = a.doctor?.fullName ?? `Doctor #${a.doctorId}`;
@@ -221,73 +269,150 @@ const MyAppointments: React.FC = () => {
     );
   };
 
-  return (
-    <div className="min-h-screen flex flex-col bg-muted">
-      <PatientDashboardNavBar navLinks={navLinks} />
-      <main className="flex-1 max-w-6xl mx-auto mt-8 px-4 pb-10 space-y-8">
-        <Card className="p-6 md:p-8">
-          <h1 className="text-2xl font-semibold text-foreground mb-2">My Appointments</h1>
-          <p className="text-muted-foreground text-sm mb-4">
-            View and manage your upcoming, past and cancelled appointments.
-          </p>
-        </Card>
+ return (
+  <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 via-white to-blue-100">
+    <PatientDashboardNavBar navLinks={navLinks} />
 
-        {error && (
-          <Card className="p-4 border-red-200 bg-red-50 text-red-700 text-sm">
-            {error}
-          </Card>
-        )}
+    <main className="flex-1 max-w-7xl mx-auto px-6 mt-10 space-y-16">
 
-        {loading && (
-          <Card className="p-5 text-sm text-muted-foreground">
-            Loading appointments...
-          </Card>
-        )}
+      {/* ===== Header Section ===== */}
+      <section className="bg-white rounded-3xl shadow-xl p-8 md:p-10 space-y-4">
+        <p className="text-xs uppercase tracking-widest text-primary font-medium">
+          Appointment Management
+        </p>
 
-        <section className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-foreground">Upcoming appointments</h2>
-            <Button
-              className="bg-primary text-white hover:bg-primary/90 text-sm font-semibold"
-              onClick={() => navigate('/appointments')}
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-800">
+          My <span className="text-primary">Appointments</span>
+        </h1>
+
+        <p className="text-gray-600 text-sm md:text-base">
+          View, manage and track your upcoming, completed and cancelled appointments.
+        </p>
+      </section>
+
+
+      {/* ===== Appointment Summary Cards ===== */}
+      {!loading && (
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            { label: "Upcoming", value: upcoming.length },
+            { label: "Completed", value: past.length },
+            { label: "Cancelled", value: cancelled.length },
+          ].map(item => (
+            <Card
+              key={item.label}
+              className="rounded-2xl shadow-md border-none p-6 bg-white text-center"
             >
-              Book new appointment
-            </Button>
+              <div className="text-3xl font-bold text-primary">
+                {item.value}
+              </div>
+              <div className="text-gray-500 text-sm mt-1">
+                {item.label} Appointments
+              </div>
+            </Card>
+          ))}
+        </section>
+      )}
+
+
+      {/* ===== Error State ===== */}
+      {error && (
+        <Card className="rounded-2xl shadow-md border-none p-5 bg-red-50 text-red-600 text-sm">
+          {error}
+        </Card>
+      )}
+
+
+      {/* ===== Upcoming Section ===== */}
+      <section className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-semibold text-gray-800">
+            Upcoming Appointments
+          </h2>
+
+          <button
+            onClick={() => navigate('/appointments')}
+            className="px-5 py-2 rounded-lg bg-primary text-white shadow-md hover:shadow-lg hover:scale-105 transition"
+          >
+            Book Appointment
+          </button>
+        </div>
+
+        {loading ? null : upcoming.length === 0 ? (
+          <Card className="rounded-2xl shadow-md border-none p-6 text-center text-gray-500">
+            You have no upcoming appointments.
+          </Card>
+        ) : (
+          <div className="space-y-4">
+            {upcoming.map(appointment => (
+              <div
+                key={appointment.id}
+                className="bg-white rounded-2xl shadow-md p-5 transition hover:-translate-y-1 hover:shadow-xl"
+              >
+                {renderAppointmentCard(appointment)}
+              </div>
+            ))}
           </div>
-          {loading ? null : upcoming.length === 0 ? (
-            <Card className="p-5 text-sm text-muted-foreground">
-              You have no upcoming appointments.
-            </Card>
-          ) : (
-            <div className="space-y-3">{upcoming.map(renderAppointmentCard)}</div>
-          )}
-        </section>
+        )}
+      </section>
 
-        <section className="space-y-3">
-          <h2 className="text-lg font-semibold text-foreground">Past appointments</h2>
-          {loading ? null : past.length === 0 ? (
-            <Card className="p-5 text-sm text-muted-foreground">
-              No completed appointments yet.
-            </Card>
-          ) : (
-            <div className="space-y-3">{past.map(renderAppointmentCard)}</div>
-          )}
-        </section>
 
-        <section className="space-y-3">
-          <h2 className="text-lg font-semibold text-foreground">Cancelled appointments</h2>
-          {loading ? null : cancelled.length === 0 ? (
-            <Card className="p-5 text-sm text-muted-foreground">
-              No cancelled appointments.
-            </Card>
-          ) : (
-            <div className="space-y-3">{cancelled.map(renderAppointmentCard)}</div>
-          )}
-        </section>
-      </main>
+      {/* ===== Past Section ===== */}
+      <section className="space-y-6">
+        <h2 className="text-2xl font-semibold text-gray-800">
+          Completed Appointments
+        </h2>
+
+        {loading ? null : past.length === 0 ? (
+          <Card className="rounded-2xl shadow-md border-none p-6 text-center text-gray-500">
+            No completed appointments yet.
+          </Card>
+        ) : (
+          <div className="space-y-4">
+            {past.map(appointment => (
+              <div
+                key={appointment.id}
+                className="bg-white rounded-2xl shadow-md p-5 transition hover:-translate-y-1 hover:shadow-xl"
+              >
+                {renderAppointmentCard(appointment)}
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+
+      {/* ===== Cancelled Section ===== */}
+      <section className="space-y-6 pb-10">
+        <h2 className="text-2xl font-semibold text-gray-800">
+          Cancelled Appointments
+        </h2>
+
+        {loading ? null : cancelled.length === 0 ? (
+          <Card className="rounded-2xl shadow-md border-none p-6 text-center text-gray-500">
+            No cancelled appointments.
+          </Card>
+        ) : (
+          <div className="space-y-4">
+            {cancelled.map(appointment => (
+              <div
+                key={appointment.id}
+                className="bg-white rounded-2xl shadow-md p-5 transition hover:-translate-y-1 hover:shadow-xl"
+              >
+                {renderAppointmentCard(appointment)}
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+    </main>
+
+    <div className="mt-16">
       <Footer />
     </div>
-  );
+  </div>
+);
 };
 
 export default MyAppointments;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '../auth';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Heart, User, LogOut, Settings } from 'lucide-react';
+import { Heart, User, LogOut, Settings, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -27,161 +27,179 @@ const PatientDashboardNavBar: React.FC<PatientDashboardNavBarProps> = ({ navLink
   const location = useLocation();
   const navigate = useNavigate();
 
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+
   let activeSection = 'home';
   if (location.pathname === '/about') activeSection = 'hospital';
   else if (location.pathname.includes('appointments')) activeSection = 'appointments';
   else if (location.pathname.includes('doctors')) activeSection = 'doctors';
 
-  const [profilePhoto, setProfilePhoto] = React.useState<string | null>(() => {
-    const stored = localStorage.getItem('profilePhoto');
-    return stored ? stored : null;
-  });
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        setProfilePhoto(ev.target?.result as string);
-        localStorage.setItem('profilePhoto', ev.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const handleNavClick = (id: string) => {
-    if (id === 'home') {
-      if (location.pathname !== '/') navigate('/');
-    } else if (id === 'hospital') {
-      if (location.pathname !== '/about') navigate('/about');
-    } else if (id === 'appointments') {
-      if (location.pathname !== '/appointments') navigate('/my-appointments');
-    } else if (id === 'doctors') {
-      if (location.pathname !== '/doctors') navigate('/doctors');
-    }
+    setMobileOpen(false);
+
+    if (id === 'home') navigate('/');
+    else if (id === 'hospital') navigate('/about');
+    else if (id === 'appointments') navigate('/my-appointments');
+    else if (id === 'doctors') navigate('/doctors');
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm border-b border-border px-6 py-2.5">
-      <div className="max-w-6xl mx-auto flex items-center">
-        {/* Brand */}
-        <button
-          onClick={() => handleNavClick('home')}
-          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-        >
-          <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-            <Heart className="h-4.5 w-4.5 text-primary" />
-          </div>
-          <span className="text-lg font-bold text-foreground tracking-tight hidden sm:inline">ABC Hospital</span>
-        </button>
+    <>
+      <nav className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-border px-6 py-3">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
 
-        {/* Nav Links */}
-        <div className="flex-1 flex items-center justify-center gap-1">
+          {/* Brand */}
           <button
             onClick={() => handleNavClick('home')}
-            className={`relative px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-              activeSection === 'home'
-                ? 'text-primary bg-primary/8'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-            }`}
-            aria-current={activeSection === 'home' ? 'page' : undefined}
+            className="flex items-center gap-2"
           >
-            Home
-            {activeSection === 'home' && (
-              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-0.5 bg-primary rounded-full" />
-            )}
+            <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Heart className="h-5 w-5 text-primary" />
+            </div>
+            <span className="text-lg font-bold hidden sm:inline">
+              ABC Hospital
+            </span>
           </button>
-          {navLinks.map((link) => (
-            <button
-              key={link.id}
-              onClick={() => handleNavClick(link.id)}
-              className={`relative px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                activeSection === link.id
-                  ? 'text-primary bg-primary/8'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-              }`}
-              aria-current={activeSection === link.id ? 'page' : undefined}
-            >
-              {link.label}
-              {activeSection === link.id && (
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-0.5 bg-primary rounded-full" />
-              )}
-            </button>
-          ))}
-        </div>
 
-        {/* Right side */}
-        <div className="flex items-center gap-2">
-          {!isLoggedIn && (
-            <Button
-              size="sm"
-              className="font-medium"
-              onClick={() => (window.location.href = '/login')}
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center gap-2">
+            <button
+              onClick={() => handleNavClick('home')}
+              className={`px-4 py-2 text-sm rounded-lg transition ${
+                activeSection === 'home'
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:bg-muted'
+              }`}
             >
-              Login
+              Home
+            </button>
+
+            {navLinks.map((link) => (
+              <button
+                key={link.id}
+                onClick={() => handleNavClick(link.id)}
+                className={`px-4 py-2 text-sm rounded-lg transition ${
+                  activeSection === link.id
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-muted-foreground hover:bg-muted'
+                }`}
+              >
+                {link.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Right Side */}
+          <div className="flex items-center gap-2">
+
+            {/* Desktop Login */}
+            {!isLoggedIn && (
+              <div className="hidden md:block">
+                <Button size="sm" onClick={() => navigate('/login')}>
+                  Login
+                </Button>
+              </div>
+            )}
+
+            {/* Mobile Hamburger */}
+            <div className="md:hidden">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setMobileOpen(true)}
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+            </div>
+
+            {/* Desktop Profile */}
+            {isLoggedIn && (
+              <div className="hidden md:block">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-9 w-9 rounded-full p-0">
+                      <Avatar className="h-9 w-9 border">
+                        <AvatarFallback>
+                          {user?.firstName?.charAt(0)?.toUpperCase() || <User className="h-4 w-4" />}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>
+                      <span className="font-medium text-gray-800">
+                        {user ? `${user.firstName} ${user.lastName}` : 'User'}
+                      </span>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate('/profile/edit')}>
+                      <Settings className="h-4 w-4 mr-2 text-gray-800" />
+                      Edit Profile
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={logout}>
+                      <LogOut className="h-4 w-4 mr-2 text-red-800" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            )}
+          </div>
+        </div>
+      </nav>
+
+      {/* Mobile Slide Menu */}
+      <div
+        className={`fixed inset-0 z-50 transition-all duration-300 ${
+          mobileOpen ? 'visible opacity-100' : 'invisible opacity-0'
+        }`}
+      >
+        {/* Overlay */}
+        <div
+          className="absolute inset-0 bg-black/40"
+          onClick={() => setMobileOpen(false)}
+        />
+
+        {/* Sidebar */}
+        <div
+          className={`absolute top-0 left-0 h-full w-64 bg-white shadow-xl transform transition-transform duration-300 ${
+            mobileOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+        >
+          <div className="flex items-center justify-between p-4 border-b">
+            <span className="font-semibold">Menu</span>
+            <Button variant="ghost" size="icon" onClick={() => setMobileOpen(false)}>
+              <X className="h-5 w-5" />
             </Button>
-          )}
-          {isLoggedIn && (
-            <>
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                ref={fileInputRef}
-                onChange={handlePhotoChange}
-              />
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-9 w-9 rounded-full p-0">
-                    <Avatar className="h-9 w-9 border border-border">
-                      {profilePhoto ? (
-                        <AvatarImage src={profilePhoto} alt="Profile" />
-                      ) : null}
-                      <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
-                        {user?.firstName?.charAt(0)?.toUpperCase() || <User className="h-4 w-4" />}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" sideOffset={8}>
-                  <div className="flex items-center gap-3 px-3 py-3">
-                    <Avatar className="h-10 w-10 border border-border">
-                      {profilePhoto ? (
-                        <AvatarImage src={profilePhoto} alt="Profile" />
-                      ) : null}
-                      <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                        {user?.firstName?.charAt(0)?.toUpperCase() || <User className="h-5 w-5" />}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <DropdownMenuLabel className="p-0 text-sm font-semibold text-foreground">
-                        {user?.firstName || 'User'}
-                      </DropdownMenuLabel>
-                      <span className="text-xs text-muted-foreground">{user?.email || ''}</span>
-                    </div>
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="cursor-pointer gap-2 text-foreground"
-                    onClick={() => navigate('/profile/edit')}
-                  >
-                    <Settings className="h-4 w-4" />
-                    Edit Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="cursor-pointer gap-2 text-destructive focus:text-destructive"
-                    onClick={() => logout()}
-                  >
-                    <LogOut className="h-4 w-4" />
-                    Logout
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </>
-          )}
+          </div>
+
+          <div className="flex flex-col gap-2 p-4">
+            <button
+              onClick={() => handleNavClick('home')}
+              className="text-left px-3 py-2 rounded-lg hover:bg-muted"
+            >
+              Home
+            </button>
+
+            {navLinks.map((link) => (
+              <button
+                key={link.id}
+                onClick={() => handleNavClick(link.id)}
+                className="text-left px-3 py-2 rounded-lg hover:bg-muted"
+              >
+                {link.label}
+              </button>
+            ))}
+
+            {!isLoggedIn && (
+              <Button className="mt-4" onClick={() => navigate('/login')}>
+                Login
+              </Button>
+            )}
+          </div>
         </div>
       </div>
-    </nav>
+    </>
   );
 };
 
