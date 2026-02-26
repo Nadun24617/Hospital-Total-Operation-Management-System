@@ -36,6 +36,10 @@ model User {
   updatedAt    DateTime   @updatedAt
   doctor       Doctor?
   appointments Appointment[]
+
+  labRequestsCreated   LabRequest[] @relation("LabRequestDoctor")
+  labRequestsAsPatient LabRequest[] @relation("LabRequestPatient")
+  labRequestsHandled   LabRequest[] @relation("LabRequestTechnician")
 }
 
 
@@ -63,6 +67,12 @@ enum AppointmentStatus {
   CANCELLED
 }
 
+enum LabRequestStatus {
+  PENDING
+  SAMPLE_COLLECTED
+  COMPLETED
+}
+
 model Appointment {
   id              Int               @id @default(autoincrement()) @map("appointment_id")
   doctorId        Int               @map("doctor_id")
@@ -81,6 +91,49 @@ model Appointment {
   doctor Doctor @relation(fields: [doctorId], references: [id])
   user   User?  @relation(fields: [userId], references: [id])
 
+  labRequests LabRequest[]
+
   @@index([userId])
   @@index([doctorId, date])
+}
+
+model LabRequest {
+  id               Int              @id @default(autoincrement()) @map("lab_request_id")
+  code             String           @unique @db.VarChar(32) @map("code")
+  doctorUserId     String           @db.VarChar(36) @map("doctor_user_id")
+  patientUserId    String?          @db.VarChar(36) @map("patient_user_id")
+  technicianUserId String?          @db.VarChar(36) @map("technician_user_id")
+  appointmentId    Int?             @map("appointment_id")
+  patientName      String           @db.VarChar(150) @map("patient_name")
+  status           LabRequestStatus @default(PENDING)
+  technicianName   String?          @db.VarChar(150) @map("technician_name")
+  createdAt        DateTime         @default(now()) @map("created_at")
+  sampleCollectedAt DateTime?       @map("sample_collected_at")
+  completedAt      DateTime?        @map("completed_at")
+
+  doctorUser      User         @relation("LabRequestDoctor", fields: [doctorUserId], references: [id])
+  patientUser     User?        @relation("LabRequestPatient", fields: [patientUserId], references: [id])
+  technicianUser  User?        @relation("LabRequestTechnician", fields: [technicianUserId], references: [id])
+  appointment     Appointment? @relation(fields: [appointmentId], references: [id])
+  tests           LabRequestTest[]
+
+  @@index([doctorUserId])
+  @@index([patientUserId])
+  @@index([appointmentId])
+  @@index([status])
+}
+
+model LabRequestTest {
+  id            Int      @id @default(autoincrement()) @map("lab_request_test_id")
+  labRequestId  Int      @map("lab_request_id")
+  testName      String   @db.VarChar(120) @map("test_name")
+  resultValue   String?  @db.VarChar(100) @map("result_value")
+  resultRemarks String?  @db.Text @map("result_remarks")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  labRequest LabRequest @relation(fields: [labRequestId], references: [id], onDelete: Cascade)
+
+  @@index([labRequestId])
+  @@unique([labRequestId, testName])
 }

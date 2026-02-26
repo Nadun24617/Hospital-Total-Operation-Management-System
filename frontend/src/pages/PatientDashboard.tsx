@@ -20,7 +20,7 @@ const PatientDashboard: React.FC = () => {
     { title: 'My Appointments', desc: 'View and manage bookings', icon: ClipboardList, onClick: () => navigate('/my-appointments') },
     { title: 'Patient Records', desc: 'Secure medical history', icon: FolderOpen },
     { title: 'Billing & Payments', desc: 'View bills and pay online', icon: CreditCard },
-    { title: 'Pharmacy & Lab Reports', desc: 'Prescriptions and test results', icon: FlaskConical },
+    { title: 'Pharmacy & Lab Reports', desc: 'Prescriptions and test results', icon: FlaskConical, onClick: () => navigate('/my-lab-reports') },
   ];
 
   return (

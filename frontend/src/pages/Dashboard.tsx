@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import SidePanel from '../components/SidePanel';
 import AdminUserManagement from '../components/AdminUserManagement';
 import DoctorProfiles from '../components/DoctorProfiles';
+import PatientManagement from '../components/PatientManagement';
 import AppointmentManagement from '../components/AppointmentManagement';
+import LabManagement from '../components/LabManagement';
 import { useAuth } from '../auth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Stethoscope, CalendarDays, FlaskConical, Pill, Scissors, BedDouble, CreditCard, BarChart3, ShieldCheck } from 'lucide-react';
@@ -55,9 +57,15 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             {activeFeature.label === 'Admin' && <AdminUserManagement />}
+            {activeFeature.label === 'Patient Management' && <PatientManagement />}
             {activeFeature.label === 'Doctor Profiles' && <DoctorProfiles />}
             {activeFeature.label === 'Doctor Channeling' && <AppointmentManagement />}
-            {activeFeature.label !== 'Admin' && activeFeature.label !== 'Doctor Profiles' && activeFeature.label !== 'Doctor Channeling' && (
+            {activeFeature.label === 'Lab Management' && <LabManagement mode="lab" />}
+            {activeFeature.label !== 'Admin' &&
+              activeFeature.label !== 'Patient Management' &&
+              activeFeature.label !== 'Doctor Profiles' &&
+              activeFeature.label !== 'Doctor Channeling' &&
+              activeFeature.label !== 'Lab Management' && (
               <p className="text-muted-foreground">Welcome to the {activeFeature.label} section.</p>
             )}
           </CardContent>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth';
+import LabManagement from '../components/LabManagement';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { LayoutDashboard, Clock, Users, CalendarDays, History, User, ChevronLeft, ChevronRight, LogOut } from 'lucide-react';
+import { LayoutDashboard, Clock, Users, CalendarDays, History, User, ChevronLeft, ChevronRight, LogOut, FlaskConical } from 'lucide-react';
 
 interface StatCardProps {
   label: string;
@@ -42,7 +43,7 @@ export default function DoctorDashboard() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
-  const [activeSection, setActiveSection] = useState<'dashboard' | 'appointments' | 'patients' | 'schedule' | 'history' | 'profile'>('dashboard');
+  const [activeSection, setActiveSection] = useState<'dashboard' | 'appointments' | 'patients' | 'schedule' | 'history' | 'profile' | 'lab'>('dashboard');
 
   const todaySummary = {
     todaysAppointments: 12,
@@ -72,6 +73,7 @@ export default function DoctorDashboard() {
     { id: 'dashboard' as const, label: 'Dashboard', icon: <LayoutDashboard className="h-5 w-5" /> },
     { id: 'appointments' as const, label: 'Appointments', icon: <Clock className="h-5 w-5" /> },
     { id: 'patients' as const, label: 'Patient List', icon: <Users className="h-5 w-5" /> },
+    { id: 'lab' as const, label: 'Lab Requests', icon: <FlaskConical className="h-5 w-5" /> },
     { id: 'schedule' as const, label: 'Schedule / Availability', icon: <CalendarDays className="h-5 w-5" /> },
     { id: 'history' as const, label: 'Consultation History', icon: <History className="h-5 w-5" /> },
     { id: 'profile' as const, label: 'Profile', icon: <User className="h-5 w-5" /> },
@@ -156,6 +158,7 @@ export default function DoctorDashboard() {
               {activeSection === 'dashboard' && 'Today\'s Overview'}
               {activeSection === 'appointments' && 'Appointments'}
               {activeSection === 'patients' && 'Patient List'}
+              {activeSection === 'lab' && 'Lab Requests'}
               {activeSection === 'schedule' && 'Schedule & Availability'}
               {activeSection === 'history' && 'Consultation History'}
               {activeSection === 'profile' && 'Profile'}
@@ -326,6 +329,14 @@ export default function DoctorDashboard() {
           )}
 
           {activeSection !== 'dashboard' && (
+            <>
+              {activeSection === 'lab' ? (
+                <Card>
+                  <CardContent className="p-6">
+                    <LabManagement mode="doctor" />
+                  </CardContent>
+                </Card>
+              ) : (
             <Card>
               <CardContent className="p-6 text-sm text-slate-500 flex items-center justify-center">
                 <p>
@@ -334,6 +345,8 @@ export default function DoctorDashboard() {
                 </p>
               </CardContent>
             </Card>
+              )}
+            </>
           )}
         </section>
       </main>

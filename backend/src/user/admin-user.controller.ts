@@ -5,6 +5,8 @@ import { UserRole } from '@prisma/client';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 import { CreateStaffDto } from './dto/create-staff.dto';
+import { CreatePatientDto } from './dto/create-patient.dto';
+import { UpdateUserAdminDto } from './dto/update-user-admin.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { UserService } from './user.service';
 
@@ -39,5 +41,20 @@ export class AdminUserController {
       message: 'Staff account created successfully',
       user: this.userService.sanitize(user)
     };
+  }
+
+  @Post('patients')
+  async createPatient(@Body() dto: CreatePatientDto) {
+    const user = await this.userService.createPatient(dto);
+    return {
+      message: 'Patient account created successfully',
+      user: this.userService.sanitize(user)
+    };
+  }
+
+  @Patch(':id')
+  async updatePatient(@Param('id') id: string, @Body() dto: UpdateUserAdminDto) {
+    const user = await this.userService.updatePatientByAdmin(id, dto);
+    return this.userService.sanitize(user);
   }
 }
