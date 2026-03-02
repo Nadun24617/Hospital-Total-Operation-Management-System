@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Check } from 'lucide-react';
+import { Check, Loader2, Brain } from 'lucide-react';
 
 import {
   Select,
@@ -71,7 +71,9 @@ interface AppointmentView {
   createdAt: string;
 }
 
-type Step = 'selectDoctor' | 'dateTime' | 'detailsForm' | 'confirm' | 'success';
+export type AppointmentStatus = 'UPCOMING' | 'COMPLETED' | 'CANCELLED';
+
+type Step = 'symptoms' | 'selectDoctor' | 'dateTime' | 'detailsForm' | 'confirm' | 'success';
 
 const DEFAULT_TIME_SLOTS = [
   '09:00',
@@ -95,7 +97,7 @@ const AppointmentBooking: React.FC = () => {
     [token]
   );
 
-  const [step, setStep] = useState<Step>('selectDoctor');
+  const [step, setStep] = useState<Step>('symptoms');
   const [doctors, setDoctors] = useState<ApiDoctor[]>([]);
   const [selectedDoctorId, setSelectedDoctorId] = useState<number | null>(null);
   const [date, setDate] = useState('');
@@ -105,7 +107,15 @@ const AppointmentBooking: React.FC = () => {
   const [reason, setReason] = useState('');
   const [appointmentType, setAppointmentType] = useState('Consultation');
 
-  const [createdAppointment, setCreatedAppointment] =
+  // AI suggestion state
+  const [symptoms, setSymptoms] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState('');
+  const [suggestedSpecIds, setSuggestedSpecIds] = useState<number[]>([]);
+  const [aiReasoning, setAiReasoning] = useState('');
+  const [aiDisclaimer, setAiDisclaimer] = useState('');
+
+  const [, setCreatedAppointment] =
     useState<AppointmentView | null>(null);
 
   const [createLoading, setCreateLoading] = useState(false);
@@ -120,6 +130,11 @@ const AppointmentBooking: React.FC = () => {
     () => doctors.find((d) => d.id === selectedDoctorId) || null,
     [doctors, selectedDoctorId]
   );
+
+  const filteredDoctors = useMemo(() => {
+    if (suggestedSpecIds.length === 0) return doctors;
+    return doctors.filter((d) => suggestedSpecIds.includes(d.specializationId));
+  }, [doctors, suggestedSpecIds]);
 
   useEffect(() => {
     if (user) {
@@ -150,6 +165,32 @@ const AppointmentBooking: React.FC = () => {
     const today = new Date();
     return today.toISOString().split('T')[0];
   }, []);
+
+  const handleSymptomCheck = async () => {
+    if (symptoms.trim().length < 10) return;
+    setAiLoading(true);
+    setAiError('');
+
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/ai-suggestion/check-symptoms`,
+        { symptoms },
+        { headers: authHeaders }
+      );
+
+      setSuggestedSpecIds(
+        res.data.specializations.map((s: { id: number }) => s.id)
+      );
+      setAiReasoning(res.data.reasoning);
+      setAiDisclaimer(res.data.disclaimer);
+      setStep('selectDoctor');
+    } catch {
+      setAiError('Could not get AI suggestions. You can still choose a doctor manually.');
+      setStep('selectDoctor');
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   const handleConfirm = () => {
     if (!selectedDoctor || !date || !timeSlot) return;
@@ -209,9 +250,10 @@ const AppointmentBooking: React.FC = () => {
 
   const renderStepHeader = () => (
     <div className="flex flex-wrap gap-3 mb-8 p-3 bg-white rounded-2xl shadow-sm">
-      {['Doctor', 'Date & Time', 'Details', 'Confirm', 'Success'].map(
+      {['Symptoms', 'Doctor', 'Date & Time', 'Details', 'Confirm', 'Success'].map(
         (label, index) => {
           const steps: Step[] = [
+            'symptoms',
             'selectDoctor',
             'dateTime',
             'detailsForm',
@@ -241,6 +283,81 @@ const AppointmentBooking: React.FC = () => {
     </div>
   );
 
+  const renderSymptomStep = () => (
+    <Card className="p-8 rounded-3xl shadow-lg bg-white">
+      {renderStepHeader()}
+
+      <div className="flex items-center gap-3 mb-2">
+        <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+          <Brain className="w-6 h-6 text-primary" />
+        </div>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800">
+            Describe Your Symptoms
+          </h1>
+          <p className="text-gray-500 text-sm mt-0.5">
+            Tell us what you're experiencing and our AI will suggest the right specialist.
+          </p>
+        </div>
+      </div>
+
+      <Textarea
+        placeholder="e.g. I have been experiencing chest pain and shortness of breath for the past 3 days..."
+        value={symptoms}
+        onChange={(e) => setSymptoms(e.target.value)}
+        className="min-h-[140px] mt-6"
+      />
+
+      {symptoms.length > 0 && symptoms.trim().length < 10 && (
+        <p className="text-xs text-muted-foreground mt-2">
+          Please write at least 10 characters to describe your symptoms.
+        </p>
+      )}
+
+      {aiError && (
+        <p className="text-amber-600 text-sm mt-3">{aiError}</p>
+      )}
+
+      {aiLoading && (
+        <div className="flex flex-col items-center justify-center py-8">
+          <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
+          <p className="text-gray-600">Our AI is analyzing your symptoms...</p>
+        </div>
+      )}
+
+      <div className="flex justify-between mt-8">
+        <Button
+          variant="outline"
+          onClick={() => {
+            setSuggestedSpecIds([]);
+            setAiReasoning('');
+            setAiDisclaimer('');
+            setStep('selectDoctor');
+          }}
+        >
+          Skip &mdash; Browse All Doctors
+        </Button>
+
+        <Button
+          disabled={symptoms.trim().length < 10 || aiLoading}
+          onClick={handleSymptomCheck}
+        >
+          {aiLoading ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Analyzing...
+            </>
+          ) : (
+            <>
+              <Brain className="w-4 h-4 mr-2" />
+              Get AI Suggestion
+            </>
+          )}
+        </Button>
+      </div>
+    </Card>
+  );
+
   const renderDoctorSelection = () => (
     <Card className="p-8 rounded-3xl shadow-lg bg-white">
       {renderStepHeader()}
@@ -249,8 +366,26 @@ const AppointmentBooking: React.FC = () => {
         Choose Your Doctor
       </h1>
 
+      {suggestedSpecIds.length > 0 && (
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mt-4 mb-2">
+          <div className="flex items-center gap-2 mb-1">
+            <Brain className="w-4 h-4 text-blue-700" />
+            <p className="text-sm text-blue-800 font-medium">AI Recommendation</p>
+          </div>
+          <p className="text-sm text-blue-700 mt-1">{aiReasoning}</p>
+          <p className="text-xs text-blue-500 mt-2 italic">{aiDisclaimer}</p>
+          <Button
+            variant="link"
+            className="text-xs p-0 h-auto mt-2"
+            onClick={() => setSuggestedSpecIds([])}
+          >
+            Show all doctors instead
+          </Button>
+        </div>
+      )}
+
       <div className="grid md:grid-cols-3 gap-6 mt-6">
-        {doctors.map((doc) => (
+        {filteredDoctors.map((doc) => (
           <Card
             key={doc.id}
             onClick={() => {
@@ -274,6 +409,19 @@ const AppointmentBooking: React.FC = () => {
             </p>
           </Card>
         ))}
+
+        {filteredDoctors.length === 0 && (
+          <div className="col-span-3 text-center py-8">
+            <p className="text-gray-400 mb-3">No doctors found for this specialization.</p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSuggestedSpecIds([])}
+            >
+              Browse all doctors
+            </Button>
+          </div>
+        )}
       </div>
     </Card>
   );
@@ -453,12 +601,16 @@ const AppointmentBooking: React.FC = () => {
   );
 
   const resetForAnother = () => {
-    setStep('selectDoctor');
+    setStep('symptoms');
     setSelectedDoctorId(null);
     setDate('');
     setTimeSlot('');
     setReason('');
     setAppointmentType('Consultation');
+    setSymptoms('');
+    setSuggestedSpecIds([]);
+    setAiReasoning('');
+    setAiDisclaimer('');
   };
 
   if (!isLoggedIn) {
@@ -493,6 +645,7 @@ const AppointmentBooking: React.FC = () => {
       <PatientDashboardNavBar navLinks={navLinks} />
 
       <main className="flex-1 max-w-6xl mx-auto px-6 mt-10 pb-16 space-y-8">
+        {step === 'symptoms' && renderSymptomStep()}
         {step === 'selectDoctor' && renderDoctorSelection()}
         {step === 'dateTime' && renderDateTimeSelection()}
         {step === 'detailsForm' && renderDetailsForm()}
