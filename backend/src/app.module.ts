@@ -9,6 +9,7 @@ import { UserModule } from './user/user.module';
 import { DoctorModule } from './doctor/doctor.module';
 import { AppointmentModule } from './appointment/appointment.module';
 import { LabModule } from './lab/lab.module';
+import { AiSuggestionModule } from './ai-suggestion/ai-suggestion.module';
 
 @Module({
   imports: [
@@ -21,7 +22,8 @@ import { LabModule } from './lab/lab.module';
     UserModule,
     DoctorModule,
     AppointmentModule,
-    LabModule
+    LabModule,
+    AiSuggestionModule,
   ],
   controllers: [AppController],
   providers: [AppService]
