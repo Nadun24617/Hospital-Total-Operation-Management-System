@@ -3,7 +3,7 @@ import { useAuth } from '../auth';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Heart, User, LogOut, Settings, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
